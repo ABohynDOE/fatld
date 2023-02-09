@@ -8,6 +8,7 @@ authors = ["ABohynDOE <alexandre.bohyn@kuleuven.be>"]
 python = "^3.8"
 numpy = "^1.24.2"
 oapackage = "^2.7.6"
+matplotlib = "^3.6.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^5.2"
@@ -15,5 +16,5 @@ ruff = "^0.0.244"
 coverage = "^7.1.0"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["setuptools", "poetry-core>=1.2.0"]
 build-backend = "poetry.core.masonry.api"
