@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "fatld"
+version = "0.1.0"
+description = "Generate and characterize designs with four-and-two-level (FATL) factors"
+authors = ["ABohynDOE <alexandre.bohyn@kuleuven.be>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+numpy = "^1.24.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.0.1"
+black = {version = "^23.1.0", allow-prereleases = true}
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
