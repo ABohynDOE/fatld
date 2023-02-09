@@ -39,6 +39,8 @@ class Design:
     """
 
     def __init__(self, runsize: int, m: int, cols: List[int]):
+        # TODO: think about a `strict` keyword
+        # it would bypass columns check and uses only the columns suplied
         """
         Parameters
         ----------
@@ -178,7 +180,7 @@ class Design:
             Word length pattern, starting with words of length 3.
         """
         ar = oa.array_link(self.array)
-        wlp_list = ar.GWLP()[3:]
+        wlp_list = list(map(int ,ar.GWLP()[3:]))
         if max_length is not None and (max_length <= 3 or max_length > len(wlp_list)):
             warnings.warn("Wrong max_length value, ignoring")
             return wlp_list

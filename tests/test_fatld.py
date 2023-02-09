@@ -32,3 +32,10 @@ class TestBasicFactorMatrix:
     def test_unique_coded(self):
         vals = np.unique(self.coded_mat)
         assert all(vals == (-1, 1))
+
+
+def test_power2_decomposition():
+    assert fatld.main.power2_decomposition(11) == [1, 1, 0, 1]
+
+
+# TODO: test for the design class
