@@ -9,7 +9,47 @@ from .main import basic_factor_matrix, custom_design, twlp
 
 
 class Design:
+    """
+    Regular design with four- and two-level factors.
+
+    ...
+
+    Attributes
+    ----------
+    runsize : int
+        Number of runs
+    k : int
+        Number of basic factors. Equals to the log2 of the runsize.
+    m : int
+        Number of four-level factors
+    pf : List[List[int]]
+        List of the pseudo-factors triplets (as lists of integers), used to
+        define the four-level factors.
+    bf: List[int]
+        List of the column numbers of the basic factors not used
+        in the pseudo-factors `pf`.
+    p : int
+        Number of added factors
+    af : List[int]
+        List of the column numbers of the added factors
+    cols: List[int]
+        List of the column numbers of all the two-level factors of the design.
+    n: int
+        Number of two-level factors in the design
+    """
+
     def __init__(self, runsize: int, m: int, cols: List[int]):
+        """
+        Parameters
+        ----------
+        runsize : int
+            Number of runs
+        m : int
+            Number of four-level factors
+        cols: List[int]
+            List of the added factors of the design. Cannot contain columns used
+            in four-level factors and basic factors.
+        """
         # Run size value check
         if not isinstance(runsize, int) or runsize <= 0:
             raise TypeError("Runsize must be a positive integer")
@@ -92,11 +132,51 @@ class Design:
     def __repr__(self):
         return f"Design(runsize={self.runsize}, m={self.m}, cols={self.af})"
 
-    def twlp(self, type_0: bool = True, max_length: int = None):
+    def twlp(self, type_0: bool = True, max_length: int = None) -> List[List[int]]:
+        """Type-specific word length pattern
+
+        Compute the type-specific word length pattern of a design, starting with words
+        of length 3.
+
+        Parameters
+        ----------
+        type_0 : bool, optional
+            Return the word length pattern of type 0, by default True.
+            If False, return the word length pattern of type `m`.
+        max_length : int, optional
+            Max word length to display in the word length pattern, by default None,
+            all the word lengths are displayed.
+            If this number is more than the maximum word length of the design, ignores
+            it.
+
+        Returns
+        -------
+        List[List[int]]
+            Type-specific word length pattern, starting with words of length 3.
+            Each sublist give the number of words of that length, sorted by type.
+        """
         ar = oa.array_link(self.array)
         return twlp(ar, type_0, max_length)
 
-    def wlp(self, max_length: int = None):
+    def wlp(self, max_length: int = None) -> List[int]:
+        """Generalized word length pattern
+
+        Compute the word length pattern, i.e., the number of words in the defining
+        relation of the design, and arrange them by length.
+
+        Parameters
+        ----------
+        max_length : int, optional
+            Max word length to display in the word length pattern, by default None,
+            all the word lengths are displayed.
+            If this number is more than the maximum word length of the design, ignores
+            it.
+
+        Returns
+        -------
+        List[int]
+            Word length pattern, starting with words of length 3.
+        """
         ar = oa.array_link(self.array)
         wlp_list = ar.GWLP()[3:]
         if max_length is not None and (max_length <= 3 or max_length > len(wlp_list)):
