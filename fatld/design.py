@@ -3,8 +3,9 @@ from itertools import chain
 from typing import List
 
 import numpy as np
+import oapackage as oa
 
-from .main import basic_factor_matrix, custom_design
+from .main import basic_factor_matrix, custom_design, twlp
 
 
 class Design:
@@ -90,3 +91,18 @@ class Design:
 
     def __repr__(self):
         return f"Design(runsize={self.runsize}, m={self.m}, cols={self.af})"
+
+    def twlp(self, type_0: bool = True, max_length: int = None):
+        ar = oa.array_link(self.array)
+        return twlp(ar, type_0, max_length)
+
+    def wlp(self, max_length: int = None):
+        ar = oa.array_link(self.array)
+        wlp_list = ar.GWLP()[3:]
+        if max_length is not None and (max_length <= 3 or max_length > len(wlp_list)):
+            warnings.warn("Wrong max_length value, ignoring")
+            return wlp_list
+        elif max_length is None:
+            return wlp_list
+        else:
+            return wlp_list[0 : (max_length - 2)]
