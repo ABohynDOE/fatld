@@ -7,13 +7,12 @@ authors = ["ABohynDOE <alexandre.bohyn@kuleuven.be>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 numpy = "^1.24.2"
-
-[tool.poetry.dev-dependencies]
-pytest = "^5.2"
+oapackage = "^2.7.6"
 
 [tool.poetry.group.dev.dependencies]
-autopep8 = "^2.0.1"
-black = {version = "^23.1.0", allow-prereleases = true}
+pytest = "^5.2"
+ruff = "^0.0.244"
+coverage = "^7.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
