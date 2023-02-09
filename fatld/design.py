@@ -4,7 +4,7 @@ from typing import List
 
 import numpy as np
 
-from main import basic_factor_matrix, custom_design
+from .main import basic_factor_matrix, custom_design
 
 
 class Design:
@@ -89,4 +89,4 @@ class Design:
         return f"4^{self.m} 2^{self.n}-{self.p} design in {self.runsize} runs"
 
     def __repr__(self):
-        return f"Design({self.runsize}, {self.m}, {self.af})"
+        return f"Design(runsize={self.runsize}, m={self.m}, cols={self.af})"
