@@ -81,7 +81,7 @@ class Design:
         ]
 
         # Available basic factors are the ones not used in the four-level factors
-        all_basic_factors = [2**i for i in range(self.k)]
+        all_basic_factors = [2 ** i for i in range(self.k)]
         self.bf = [i for i in all_basic_factors if i not in chain(*self.pf)]
 
         # Cols value check
@@ -89,7 +89,7 @@ class Design:
             raise TypeError("`cols` must be a list of integer")
         if not all([isinstance(i, int) for i in cols]):
             raise TypeError("All column numbers must be positive integers")
-        if not all([(i < self.runsize and i > 0) for i in cols]):
+        if not all([(self.runsize > i > 0) for i in cols]):
             raise ValueError(
                 "Column numbers cannot be negative or greater than the runsize"
             )
@@ -122,7 +122,7 @@ class Design:
         for i in range(self.m):
             idx = [2 * i, ((2 * i) + 1)]
             coeff_matrix_4lvl[idx, i] = [2, 1]
-            four_lvl_part = bf_matrix[:, 0 : (2 * self.m)] @ coeff_matrix_4lvl
+        four_lvl_part = bf_matrix[:, 0: (2 * self.m)] @ coeff_matrix_4lvl
         # 2-level part
         two_lvl_part = custom_design(self.runsize, self.cols)
         # Assemble into one matrix
@@ -180,11 +180,27 @@ class Design:
             Word length pattern, starting with words of length 3.
         """
         ar = oa.array_link(self.array)
-        wlp_list = list(map(int ,ar.GWLP()[3:]))
+        wlp_list = list(map(int, ar.GWLP()[3:]))
         if max_length is not None and (max_length <= 3 or max_length > len(wlp_list)):
             warnings.warn("Wrong max_length value, ignoring")
             return wlp_list
         elif max_length is None:
             return wlp_list
         else:
-            return wlp_list[0 : (max_length - 2)]
+            return wlp_list[0: (max_length - 2)]
+
+    def flatten(self) -> np.ndarray:
+        """
+        Flatten each four-level factor of the design into two independent two-level
+        factors.
+
+        Returns
+        -------
+        np.ndarray
+            The flattened design containing `2*m + n` two-level factors.
+        """
+        flat_4lvl_part = np.zeros((self.runsize, 2 * self.m), dtype=int)
+        for i in range(self.m):
+            flat_4lvl_part[:, 2 * i] = self.array[:, i] > 1
+            flat_4lvl_part[:, (2 * i + 1)] = self.array[:, i] % 2 == 0
+        return np.concatenate((flat_4lvl_part, self.array[:, self.m:]), axis=1)
