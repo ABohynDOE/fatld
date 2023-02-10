@@ -19,18 +19,18 @@ def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
     ----------
     k : int
         Number of basic factors
-        zero_coding : bool, optional
-            The matrix is in 0/1 coding instead of -1/1 coding, by default True
+    zero_coding : bool, optional
+        The matrix is in 0/1 coding instead of -1/1 coding, by default True
 
-        Returns
+    Returns
     -------
     np.ndarray
         Basic factor matrix
     """
-    mat = np.zeros((2**k, k), dtype=int)
+    mat = np.zeros((2 ** k, k), dtype=int)
     for i in range(k):
-        unit = [0] * (2**k // 2 ** (i + 1)) + [1] * (2**k // 2 ** (i + 1))
-        mat[:, i] = unit * 2**i
+        unit = [0] * (2 ** k // 2 ** (i + 1)) + [1] * (2 ** k // 2 ** (i + 1))
+        mat[:, i] = unit * 2 ** i
     if not zero_coding:
         mat = (mat * 2) - 1
     return mat
@@ -38,7 +38,7 @@ def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
 
 def power2_decomposition(n: int, length: int = None) -> List[int]:
     """
-    Decompose a number into powers powers of 2 and returns the corresponding indices.
+    Decompose a number into powers of 2 and returns the corresponding indices.
 
     Parameters
     ----------
@@ -77,7 +77,7 @@ def power2_decomposition(n: int, length: int = None) -> List[int]:
     return powers
 
 
-def custom_design(runsize: int, column_list: List[int], zero_coding=True) -> np.ndarray:
+def custom_design(runsize: int, column_list: List[int]) -> np.ndarray:
     """
     Create a custom design with a specific run size, based on the column numbers
     provided.
@@ -86,10 +86,8 @@ def custom_design(runsize: int, column_list: List[int], zero_coding=True) -> np.
     ----------
     runsize : int
         Number of runs
-         : List[int]
+    column_list : List[int]
         Column numbers to be used for the design
-    zero_coding : bool, optional
-        he matrix is in 0/1 coding instead of -1/1 coding, by default True
 
     Returns
     -------
@@ -106,7 +104,7 @@ def custom_design(runsize: int, column_list: List[int], zero_coding=True) -> np.
 
 
 def twlp(
-    ar: oa.array_link, type_0: bool = True, max_length: int = None
+        ar: oa.array_link, type_0: bool = True, max_length: int = None
 ) -> List[List[int]]:
     """
     Compute the type-specific word length pattern of a design, starting with words
@@ -165,7 +163,7 @@ def twlp(
     if max_length is None:
         wlp_matrix_trimmed = wlp_matrix[:, 3:]
     else:
-        wlp_matrix_trimmed = wlp_matrix[:, 3 : (max_length + 1)]
+        wlp_matrix_trimmed = wlp_matrix[:, 3: (max_length + 1)]
     # Create a list of lists
     wlp_type_list = wlp_matrix_trimmed.T.tolist()
     # Reverse the sublists if it's not type 0 because they are ordered in type 0

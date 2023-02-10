@@ -1,6 +1,8 @@
 import random
 
 import numpy as np
+import oapackage as oa
+import pytest
 
 import fatld
 import fatld.main
@@ -17,10 +19,10 @@ class TestBasicFactorMatrix:
 
     def test_sum(self):
         row_sum = np.sum(self.mat, axis=0)
-        assert all(row_sum == (2**self.k // 2))
+        assert all(row_sum == (2 ** self.k // 2))
 
     def test_diag(self):
-        mult_mat = np.matmul(self.coded_mat.T, self.coded_mat) // 2**self.k
+        mult_mat = np.matmul(self.coded_mat.T, self.coded_mat) // 2 ** self.k
         diag_mat = np.eye(self.k)
         equal_mat = mult_mat == diag_mat
         assert equal_mat.all()
@@ -38,4 +40,27 @@ def test_power2_decomposition():
     assert fatld.main.power2_decomposition(11) == [1, 1, 0, 1]
 
 
-# TODO: test for the design class
+def test_power2_decomposition_warnings():
+    with pytest.warns(UserWarning):
+        fatld.main.power2_decomposition(11, length=2)
+
+
+class TestTWLP:
+    D = fatld.Design(32, 1, [29, 26, 22])
+    ar = oa.array_link(D.array)
+
+    def test_twlp(self):
+        twlp = fatld.main.twlp(self.ar, max_length=5)
+        assert twlp == [[0, 0], [1, 4], [0, 2]]
+
+    def test_twlp_type1(self):
+        twlp = fatld.main.twlp(self.ar, max_length=5, type_0=False)
+        assert twlp == [[0, 0], [4, 1], [2, 0]]
+
+    def test_twlp_length_None(self):
+        twlp = fatld.main.twlp(self.ar, max_length=None)
+        assert len(twlp) == self.D.m + self.D.n - 2
+
+    def test_twlp_length_wrong(self):
+        with pytest.warns(UserWarning):
+            fatld.main.twlp(self.ar, max_length=2)
