@@ -1,8 +1,8 @@
 import random
 
 import numpy as np
-import oapackage as oa
-import pytest
+import oapackage as oa  # type: ignore
+import pytest  # type: ignore
 
 import fatld
 import fatld.main

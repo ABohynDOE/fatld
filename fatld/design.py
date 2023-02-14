@@ -1,9 +1,9 @@
 import warnings
 from itertools import chain, combinations
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import numpy as np
-import oapackage as oa
+import oapackage as oa  # type: ignore
 
 from .main import basic_factor_matrix, custom_design, power2_decomposition, twlp
 
@@ -134,7 +134,9 @@ class Design:
     def __repr__(self):
         return f"Design(runsize={self.runsize}, m={self.m}, cols={self.af})"
 
-    def twlp(self, type_0: bool = True, max_length: int = None) -> List[List[int]]:
+    def twlp(
+        self, type_0: bool = True, max_length: Optional[int] = None
+    ) -> List[List[int]]:
         """Type-specific word length pattern
 
         Compute the type-specific word length pattern of a design, starting with words
@@ -160,7 +162,7 @@ class Design:
         ar = oa.array_link(self.array)
         return twlp(ar, type_0, max_length)
 
-    def wlp(self, max_length: int = None) -> List[int]:
+    def wlp(self, max_length: Optional[int] = None) -> List[int]:
         """Generalized word length pattern
 
         Compute the word length pattern, i.e., the number of words in the defining
@@ -219,7 +221,7 @@ class Design:
         else:
             return mat
 
-    def tfi_clearance(self) -> Dict[str, Dict[str, bool]]:
+    def tfi_clearance(self) -> Dict[str, Dict[str, object]]:
         """
         Compute clearance of all two-factor interactions in the design.
 

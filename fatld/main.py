@@ -5,10 +5,10 @@ Author: Alexandre Bohyn
 """
 # %% Packages
 import warnings
-from typing import List
+from typing import List, Optional
 
 import numpy as np
-import oapackage as oa
+import oapackage as oa  # type: ignore
 
 
 def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
@@ -36,7 +36,7 @@ def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
     return mat
 
 
-def power2_decomposition(n: int, length: int = None) -> List[int]:
+def power2_decomposition(n: int, length: Optional[int] = None) -> List[int]:
     """
     Decompose a number into powers of 2 and returns the corresponding indices.
 
@@ -104,7 +104,7 @@ def custom_design(runsize: int, column_list: List[int]) -> np.ndarray:
 
 
 def twlp(
-    ar: oa.array_link, type_0: bool = True, max_length: int = None
+    ar: oa.array_link, type_0: bool = True, max_length: Optional[int] = None
 ) -> List[List[int]]:
     """
     Compute the type-specific word length pattern of a design, starting with words
