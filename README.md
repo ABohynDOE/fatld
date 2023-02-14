@@ -1,5 +1,7 @@
 # `fatld`: four-and-two-level designs
 
+[![CI](https://github.com/ABohynDOE/fatld/actions/workflows/python-app.yml/badge.svg)](https://github.com/ABohynDOE/fatld/actions/workflows/python-app.yml)
+
 Generate and characterize designs with four-and-two-level (FATL) factors.
 
 ## Development
