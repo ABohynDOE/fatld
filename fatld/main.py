@@ -27,10 +27,10 @@ def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
     np.ndarray
         Basic factor matrix
     """
-    mat = np.zeros((2 ** k, k), dtype=int)
+    mat = np.zeros((2**k, k), dtype=int)
     for i in range(k):
-        unit = [0] * (2 ** k // 2 ** (i + 1)) + [1] * (2 ** k // 2 ** (i + 1))
-        mat[:, i] = unit * 2 ** i
+        unit = [0] * (2**k // 2 ** (i + 1)) + [1] * (2**k // 2 ** (i + 1))
+        mat[:, i] = unit * 2**i
     if not zero_coding:
         mat = (mat * 2) - 1
     return mat
@@ -104,7 +104,7 @@ def custom_design(runsize: int, column_list: List[int]) -> np.ndarray:
 
 
 def twlp(
-        ar: oa.array_link, type_0: bool = True, max_length: int = None
+    ar: oa.array_link, type_0: bool = True, max_length: int = None
 ) -> List[List[int]]:
     """
     Compute the type-specific word length pattern of a design, starting with words
@@ -163,7 +163,7 @@ def twlp(
     if max_length is None:
         wlp_matrix_trimmed = wlp_matrix[:, 3:]
     else:
-        wlp_matrix_trimmed = wlp_matrix[:, 3: (max_length + 1)]
+        wlp_matrix_trimmed = wlp_matrix[:, 3 : (max_length + 1)]
     # Create a list of lists
     wlp_type_list = wlp_matrix_trimmed.T.tolist()
     # Reverse the sublists if it's not type 0 because they are ordered in type 0

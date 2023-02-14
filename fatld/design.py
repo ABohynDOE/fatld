@@ -1,11 +1,11 @@
 import warnings
-from itertools import chain
-from typing import List
+from itertools import chain, combinations
+from typing import List, Dict
 
 import numpy as np
 import oapackage as oa
 
-from .main import basic_factor_matrix, custom_design, twlp
+from .main import basic_factor_matrix, custom_design, twlp, power2_decomposition
 
 
 class Design:
@@ -81,7 +81,7 @@ class Design:
         ]
 
         # Available basic factors are the ones not used in the four-level factors
-        all_basic_factors = [2 ** i for i in range(self.k)]
+        all_basic_factors = [2**i for i in range(self.k)]
         self.bf = [i for i in all_basic_factors if i not in chain(*self.pf)]
 
         # Cols value check
@@ -122,7 +122,7 @@ class Design:
         for i in range(self.m):
             idx = [2 * i, ((2 * i) + 1)]
             coeff_matrix_4lvl[idx, i] = [2, 1]
-        four_lvl_part = bf_matrix[:, 0: (2 * self.m)] @ coeff_matrix_4lvl
+        four_lvl_part = bf_matrix[:, 0 : (2 * self.m)] @ coeff_matrix_4lvl
         # 2-level part
         two_lvl_part = custom_design(self.runsize, self.cols)
         # Assemble into one matrix
@@ -187,9 +187,9 @@ class Design:
         elif max_length is None:
             return wlp_list
         else:
-            return wlp_list[0: (max_length - 2)]
+            return wlp_list[0 : (max_length - 2)]
 
-    def flatten(self) -> np.ndarray:
+    def flatten(self, zero_coding: bool = True) -> np.ndarray:
         """
         Flatten each four-level factor of the design into two independent two-level
         factors.
@@ -197,10 +197,163 @@ class Design:
         Returns
         -------
         np.ndarray
-            The flattened design containing `2*m + n` two-level factors.
+            The flattened design containing `2*m + n` two-level factors
+        zero_coding : bool, optional
+            The matrix is in 0/1 coding instead of -1/1 coding, by default True
+
         """
-        flat_4lvl_part = np.zeros((self.runsize, 2 * self.m), dtype=int)
+        flat_4lvl_part = np.zeros((self.runsize, 3 * self.m), dtype=int)
         for i in range(self.m):
-            flat_4lvl_part[:, 2 * i] = self.array[:, i] > 1
-            flat_4lvl_part[:, (2 * i + 1)] = self.array[:, i] % 2 == 0
-        return np.concatenate((flat_4lvl_part, self.array[:, self.m:]), axis=1)
+            flat_4lvl_part[:, 3 * i] = self.array[:, i] > 1
+            flat_4lvl_part[:, (3 * i + 1)] = self.array[:, i] % 2 == 0
+            # Using !XOR so that -/- and +/+ both give +
+            flat_4lvl_part[:, (3 * i + 2)] = np.logical_not(
+                np.logical_xor(self.array[:, i] > 1, self.array[:, i] % 2 == 0)
+            )
+        mat = np.concatenate((flat_4lvl_part, self.array[:, self.m :]), axis=1)
+        if zero_coding is False:
+            return mat * 2 - 1
+        else:
+            return mat
+
+    def tfi_clearance(self) -> Dict[str, Dict[str, bool]]:
+        """
+        Compute clearance of all two-factor interactions in the design.
+
+        There are three types of two-factor interactions in a design:
+        - 4-4: interaction between two pseudo-factors of four-level factors
+        - 4-2: interaction between a pseudo-factor of a four-level factor and a
+               two-level factor.
+        - 2-2: interaction between two two-level factors.
+
+        An interaction is called clear when it is not aliased with any other interaction
+        of a specific type. Thus, an interaction is '4-4 clear' when it is not aliased
+        with any 4-4 interactions, '4-2 clear' when it is not aliased with any 4-2
+        interactions, and '2-2 clear' when it is not aliased with any 2-2 interactions.
+        When an interaction is 4-4 clear, 4-2 clear, and 2-2 clear, we call it a
+        "totally clear (TC)" interaction.
+        Defining how clear is an interaction, is called the *clearance* of an
+        interaction.
+
+        Returns
+        -------
+
+        A dictionnary where each entry corresponds to an interaction of the design,
+        where the key is the name of the interaction, and the value is another
+        dictionnary, where all values are boolean, containing three entries:
+        - '4-4': the interaction is '4-4' clear (True or False)
+        - '4-2': the interaction is '4-2' clear (True or False)
+        - '2-2': the interaction is '2-2' clear (True or False)
+
+        """
+        # 4lvl PF are labeled as uppercase + number
+        label_list_4lvl_pf = [
+            [f"{chr(65 + i)}{j}" for j in [1, 2, 3]] for i in range(self.m)
+        ]
+        # 2lvl factors labeled as lowercase
+        label_list_2lvl = [chr(97 + i) for i in range(self.n)]
+        # Combinations of PF from the same four-level factors cannot be considered as
+        # for any PF, p1 x p2 = p3
+        if self.m > 1:
+            label_list_44_tfi = list(
+                chain(
+                    *[
+                        [f"{i}.{j}" for i in x for j in y]
+                        for x, y in combinations(label_list_4lvl_pf, 2)
+                    ]
+                )
+            )
+        else:
+            label_list_44_tfi = []
+        label_list_42_tfi = [
+            f"{i}.{j}"
+            for i in list(chain(*label_list_4lvl_pf))
+            for j in label_list_2lvl
+        ]
+        label_list_22_tfi = [f"{i}.{j}" for i, j in combinations(label_list_2lvl, 2)]
+        # All combinations of labels are all the TFI
+        label_list_tfi = label_list_44_tfi + label_list_42_tfi + label_list_22_tfi
+        # tfi can be one of three types: 4-4, 4-2, or 2-2
+        type_list_tfi = (
+            ["4-4"] * len(label_list_44_tfi)
+            + ["4-2"] * len(label_list_42_tfi)
+            + ["2-2"] * len(label_list_22_tfi)
+        )
+        # All alias-related variables are NA and will be filled later on
+        tfi = {i: {x: True for x in ["4-4", "4-2", "2-2"]} for i in label_list_tfi}
+        # Zero coding is needed to perform multiplication of factors
+        flat_array_coded = self.flatten(zero_coding=False)
+        four_level_pf_range = range(3 * self.m)
+        two_level_fac_range = range(3 * self.m, (3 * self.m + self.n))
+        matrix_42_tfi = np.hstack(
+            [
+                flat_array_coded[:, [i]] * flat_array_coded[:, [j]]
+                for i in four_level_pf_range
+                for j in two_level_fac_range
+            ]
+        )
+        matrix_22_tfi = np.hstack(
+            [
+                flat_array_coded[:, [i]] * flat_array_coded[:, [j]]
+                for i, j in combinations(two_level_fac_range, 2)
+            ]
+        )
+        if self.m > 1:
+            list_44_tfi = [
+                [
+                    flat_array_coded[:, [i]] * flat_array_coded[:, [j]]
+                    for i in range(3 * x, (3 * x) + 3)
+                    for j in range(3 * y, (3 * y) + 3)
+                ]
+                for x, y in combinations(range(self.m), 2)
+            ]
+            matrix_44_tfi = np.hstack(list(chain(*list_44_tfi)))
+            tfi_mat = np.concatenate(
+                (matrix_44_tfi, matrix_42_tfi, matrix_22_tfi), axis=1
+            )
+        else:
+            tfi_mat = np.concatenate((matrix_42_tfi, matrix_22_tfi), axis=1)
+        tfi_aliasing_mat = tfi_mat.T @ tfi_mat
+        # All TFI are aliased with themselves
+        np.fill_diagonal(tfi_aliasing_mat, 0)
+        row, col = np.nonzero(tfi_aliasing_mat)
+        for idx, row_num in enumerate(row):
+            tfi_label = label_list_tfi[row_num]
+            col_num = col[idx]
+            alias_type = type_list_tfi[col_num]
+            tfi[tfi_label][alias_type] = False
+        return tfi
+
+    def clearance_summary(self):
+        """
+        Print the ratio of '4-4', '4-2', '2-2', and totally clear (TC) interations of
+        the design.
+        """
+        tfi = self.tfi_clearance()
+        ff = ft = tt = tc = 0
+        for k, v in tfi.items():
+            if v["4-4"]:
+                ff += 1
+            if v["4-2"]:
+                ft += 1
+            if v["2-2"]:
+                tt += 1
+            if v["4-4"] and v["4-2"] and v["2-2"]:
+                tc += 1
+        print(
+            f"4-4: {ff}/{len(tfi)}",
+            f"4-2: {ft}/{len(tfi)}",
+            f"2-2: {tt}/{len(tfi)}",
+            f"TC: {tc}/{len(tfi)}",
+        )
+
+    def defining_relation(self):
+        letters = [chr(97 + i) for i in range(self.k)]
+        added_factors = [chr(97 + self.k + i) for i in range(self.p)]
+        relation = []
+        for idx, col in enumerate(self.af):
+            col_powers = power2_decomposition(col, length=self.k)
+            word = "".join([letters[i] for i, x in enumerate(col_powers) if x == 1])
+            relation.append(f"{word}{added_factors[idx]}")
+        # FIXME: pseudo-factors should be replaced
+        return relation
