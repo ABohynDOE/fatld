@@ -243,10 +243,11 @@ class Design:
 
         A dictionary where each entry corresponds to an interaction of the design,
         where the key is the name of the interaction, and the value is another
-        dictionary, where all values are boolean, containing three entries:
+        dictionary containing four entries:
         - '4-4': the interaction is '4-4' clear (True or False)
         - '4-2': the interaction is '4-2' clear (True or False)
         - '2-2': the interaction is '2-2' clear (True or False)
+        - 'Type': the type of the interaction, either '4-4', '4-2', or '2-2'
 
         """
         # 4lvl PF are labeled as uppercase + number
@@ -283,7 +284,10 @@ class Design:
             + ["2-2"] * len(label_list_22_tfi)
         )
         # All alias-related variables are NA and will be filled later on
-        tfi = {i: {x: True for x in ["4-4", "4-2", "2-2"]} for i in label_list_tfi}
+        tfi = dict()
+        for tfi_idx, label in enumerate(label_list_tfi):
+            tfi_type = type_list_tfi[tfi_idx]
+            tfi[label] = {"4-4": True, "4-2": True, "2-2": True, "Type": tfi_type}
         # Zero coding is needed to perform multiplication of factors
         flat_array_coded = self.flatten(zero_coding=False)
         four_level_pf_range = range(3 * self.m)
@@ -398,3 +402,32 @@ class Design:
                 for s in relation
             ]
         return relation
+
+    def add_factor(self, number: int):
+        """
+        Add a two-level factor to the design.
+
+        Generate a design with an added two-level factor defined by the number supplied.
+
+        Parameters
+        ----------
+        number : int
+            Column number of the factor to add. Cannot correspond to a column number
+            already in use (as two-level factor or pseudo-factor) in the design.
+
+        Returns
+        -------
+        Design
+            A `Design` object containing the added two-level factor
+
+        """
+        # Factor cannot be used in the columns, the pf or be out of range
+        if number < 0 or number >= self.runsize:
+            raise ValueError(
+                """Supplied column number must be greater than zero and less
+                   than the runsize."""
+            )
+        if number in self.cols or number in list(chain(*self.pf)):
+            raise ValueError(f"Column number {number} already used in the design")
+        new_cols = self.af + [number]
+        return Design(self.runsize, self.m, new_cols)
