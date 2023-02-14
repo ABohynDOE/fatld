@@ -19,10 +19,10 @@ class TestBasicFactorMatrix:
 
     def test_sum(self):
         row_sum = np.sum(self.mat, axis=0)
-        assert all(row_sum == (2 ** self.k // 2))
+        assert all(row_sum == (2**self.k // 2))
 
     def test_diag(self):
-        mult_mat = np.matmul(self.coded_mat.T, self.coded_mat) // 2 ** self.k
+        mult_mat = np.matmul(self.coded_mat.T, self.coded_mat) // 2**self.k
         diag_mat = np.eye(self.k)
         equal_mat = mult_mat == diag_mat
         assert equal_mat.all()

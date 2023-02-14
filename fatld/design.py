@@ -1,11 +1,11 @@
 import warnings
 from itertools import chain, combinations
-from typing import List, Dict
+from typing import Dict, List
 
 import numpy as np
 import oapackage as oa
 
-from .main import basic_factor_matrix, custom_design, twlp, power2_decomposition
+from .main import basic_factor_matrix, custom_design, power2_decomposition, twlp
 
 
 class Design:
@@ -18,10 +18,12 @@ class Design:
     ----------
     runsize : int
         Number of runs
-    k : int
-        Number of basic factors. Equals to the log2 of the runsize.
     m : int
         Number of four-level factors
+    cols: List[int]
+        List of the column numbers of all the two-level factors of the design.
+    k : int
+        Number of basic factors. Equals to the log2 of the runsize.
     pf : List[List[int]]
         List of the pseudo-factors triplets (as lists of integers), used to
         define the four-level factors.
@@ -32,8 +34,6 @@ class Design:
         Number of added factors
     af : List[int]
         List of the column numbers of the added factors
-    cols: List[int]
-        List of the column numbers of all the two-level factors of the design.
     n: int
         Number of two-level factors in the design
     """
@@ -194,12 +194,15 @@ class Design:
         Flatten each four-level factor of the design into two independent two-level
         factors.
 
+        Parameters
+        ----------
+        zero_coding : bool, optional
+            The matrix is in 0/1 coding instead of -1/1 coding, by default True
+
         Returns
         -------
         np.ndarray
             The flattened design containing `2*m + n` two-level factors
-        zero_coding : bool, optional
-            The matrix is in 0/1 coding instead of -1/1 coding, by default True
 
         """
         flat_4lvl_part = np.zeros((self.runsize, 3 * self.m), dtype=int)
@@ -238,9 +241,9 @@ class Design:
         Returns
         -------
 
-        A dictionnary where each entry corresponds to an interaction of the design,
+        A dictionary where each entry corresponds to an interaction of the design,
         where the key is the name of the interaction, and the value is another
-        dictionnary, where all values are boolean, containing three entries:
+        dictionary, where all values are boolean, containing three entries:
         - '4-4': the interaction is '4-4' clear (True or False)
         - '4-2': the interaction is '4-2' clear (True or False)
         - '2-2': the interaction is '2-2' clear (True or False)
@@ -341,13 +344,36 @@ class Design:
             if v["4-4"] and v["4-2"] and v["2-2"]:
                 tc += 1
         print(
-            f"4-4: {ff}/{len(tfi)}",
-            f"4-2: {ft}/{len(tfi)}",
-            f"2-2: {tt}/{len(tfi)}",
-            f"TC: {tc}/{len(tfi)}",
+            f"In total: {len(tfi)} two-factor interactions",
+            f"4-4 clear: {ff}",
+            f"4-2 clear: {ft}",
+            f"2-2 clear: {tt}",
+            f"Totally clear: {tc}",
+            sep="\n",
         )
 
-    def defining_relation(self):
+    def defining_relation(self, raw: bool = False) -> List[str]:
+        """
+        Generate the defining relation of the design.
+
+        For each added factor, generate the word representing the added factor.
+        Each word contains the generator + the letter representing the added factor.
+        The pseudo-factors used to generate the four-level factors are replaced by
+        four-level factors labels in the final words.
+        For example, if factor `A` is created using pseudo-factors `a`, `b` and `ab`,
+        then the replacement scheme is: `a -> A1`, `b -> A2`, and `ab -> A3`.
+
+        Parameters
+        ----------
+        raw : bool, optional
+            Return the relation without replacing the pseudo-factors by their four-level
+            factor label, by default False
+
+        Returns
+        -------
+        List[str]
+            Defining relation as a list of words
+        """
         letters = [chr(97 + i) for i in range(self.k)]
         added_factors = [chr(97 + self.k + i) for i in range(self.p)]
         relation = []
@@ -355,5 +381,20 @@ class Design:
             col_powers = power2_decomposition(col, length=self.k)
             word = "".join([letters[i] for i, x in enumerate(col_powers) if x == 1])
             relation.append(f"{word}{added_factors[idx]}")
-        # FIXME: pseudo-factors should be replaced
+        if raw:
+            return relation
+        for i in range(self.m):
+            pf_factors = [
+                chr(97 + 2 * i),
+                chr(97 + 2 * i + 1),
+                f"{chr(97+2*i)}{chr(97+2*i+1)}",
+            ]
+            pf_labels = [f"{chr(65+i)}{x}" for x in [1, 2, 3]]
+            # We start with p1p2 to avoid replacing p1/p2 first and not the interaction
+            relation = [
+                s.replace(pf_factors[2], pf_labels[2])
+                .replace(pf_factors[1], pf_labels[1])
+                .replace(pf_factors[0], pf_labels[0])
+                for s in relation
+            ]
         return relation
