@@ -95,7 +95,7 @@ class Design:
         # Added factors cannot be used in pseudo-factors
         if any([i in chain(*self.pf) for i in cols]):
             raise ValueError(
-                f"""Some column numbers are used to define pseudo-factors 
+                f"""Some column numbers are used to define pseudo-factors
                 for the four-level factor: {self.pf}"""
             )
         # User should know if columns are basic factors
