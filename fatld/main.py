@@ -174,13 +174,26 @@ def twlp(
         return wlp_type_list
 
 
-def num2gen(n: int) -> str:
+def num2gen(n: int, m: Optional[int] = None) -> str:
     """Return the generator corresponding to a given column number
+
+    If a value is provided for the number of four-level factors, the pseudo-factors
+    used to generate the four-level factors will be replaced by their corresponding
+    labels in the generator.
+    The labels are:
+
+    - A1=a, A2=b, A3=ab for the first factor
+    - B1=c, B2=d, B3=cd for the second factor
+    - C1=e, C2=f, C3=ef for the third factor
 
     Parameters
     ----------
     n : int
         Column number
+
+    m : Optional[int]
+        Number of four-level factors. If no value is provided, the generator will be
+        considered to come from a two-level design. Default is None.
 
     Returns
     -------
@@ -191,6 +204,8 @@ def num2gen(n: int) -> str:
     ------
     >>> num2gen(7)
     'abc'
+    >>> num2gen(7, m=1)
+    'A1c'
 
     See Also
     --------
@@ -198,9 +213,26 @@ def num2gen(n: int) -> str:
     """
     if not isinstance(n, int):
         raise TypeError("n must be an integer")
+    if m is not None and m not in [1, 2, 3]:
+        raise ValueError("Only accepted values for m are 1, 2, 3")
     powers = power2_decomposition(n)
     word = "".join([chr(97 + i) for i, x in enumerate(powers) if x == 1])
-    return word
+    if m is None:
+        return word
+    else:
+        for i in range(m):
+            pseudo_factors = [
+                chr(97 + 2 * i),
+                chr(97 + 2 * i + 1),
+                f"{chr(97+2*i)}{chr(97+2*i+1)}",
+            ]
+            pf_labels = [f"{chr(65+i)}{x}" for x in [1, 2, 3]]
+            word = (
+                word.replace(pseudo_factors[2], pf_labels[2])
+                .replace(pseudo_factors[1], pf_labels[1])
+                .replace(pseudo_factors[0], pf_labels[0])
+            )
+        return word
 
 
 def gen2num(g: str) -> int:
