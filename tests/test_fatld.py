@@ -64,3 +64,26 @@ class TestTWLP:
     def test_twlp_length_wrong(self):
         with pytest.warns(UserWarning):
             fatld.main.twlp(self.ar, max_length=2)
+
+
+def test_num2gen():
+    assert fatld.main.num2gen(7) == "abc"
+
+
+def test_num2gen_error():
+    with pytest.raises(TypeError):
+        fatld.main.num2gen("a")
+
+
+def test_gen2num():
+    assert fatld.main.gen2num("acd") == 13
+
+
+def test_gen2num_type_error():
+    with pytest.raises(TypeError):
+        fatld.main.gen2num(7)
+
+
+def test_gen2num_value_error():
+    with pytest.raises(ValueError):
+        fatld.main.gen2num("Abc")

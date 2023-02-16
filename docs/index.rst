@@ -1,26 +1,21 @@
-.. fatld documentation master file, created by
-   sphinx-quickstart on Tue Feb 14 15:54:51 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
-Welcome to fatld's documentation!
-=================================
+Building regular four-and-two-level designs in python
+=====================================================
 
-.. automodule:: fatld.design
-    :members:
+Regular designs with four-level and two-level factors can be built using the :class:`fatld.design.Design` class of this package.
+This class has a :meth:`fatld.design.Design.wlp` method.
 
-.. automodule:: fatld.main
-    :members:
+Contents
+++++++++
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-
+   word
+   documentation
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

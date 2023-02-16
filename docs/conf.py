@@ -12,6 +12,7 @@
 
 import os
 import sys
+import pkg_resources
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -23,7 +24,7 @@ copyright = "2023, Alexandre Bohyn"
 author = "Alexandre Bohyn"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.1"
+release = pkg_resources.get_distribution("fatld").version
 
 
 # -- General configuration ---------------------------------------------------
@@ -31,7 +32,7 @@ release = "0.0.1"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.coverage", "sphinx.ext.napoleon"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -47,6 +48,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+html_logo = "img/FATL.png"
 html_theme = "furo"
 
 # Add any paths that contain custom static files (such as style sheets) here,

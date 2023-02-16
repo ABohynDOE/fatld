@@ -25,7 +25,7 @@ def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        Basic factor matrix
+        A `2^k` by `k` matrix, containing the `k` basic factors
     """
     mat = np.zeros((2**k, k), dtype=int)
     for i in range(k):
@@ -172,3 +172,64 @@ def twlp(
         return [x[::-1] for x in wlp_type_list]
     else:
         return wlp_type_list
+
+
+def num2gen(n: int) -> str:
+    """Return the generator corresponding to a given column number
+
+    Parameters
+    ----------
+    n : int
+        Column number
+
+    Returns
+    -------
+    str
+        Corresponding generator
+
+    Examples
+    ------
+    >>> num2gen(7)
+    'abc'
+
+    See Also
+    --------
+    gen2num : Convert a generator into the corresponding column number
+    """
+    if not isinstance(n, int):
+        raise TypeError("n must be an integer")
+    powers = power2_decomposition(n)
+    word = "".join([chr(97 + i) for i, x in enumerate(powers) if x == 1])
+    return word
+
+
+def gen2num(g: str) -> int:
+    """Convert a generator into its corresponding column number
+
+    Generators can only contain lowercase letters from a to z.
+
+    Parameters
+    ----------
+    g : str
+        Generator
+
+    Returns
+    -------
+    int
+        Corresponding column number
+
+    Examples
+    --------
+    >>> gen2num('acd')
+    13
+
+    See Also
+    --------
+    num2gen : Convert a column number into its corresponding generator
+    """
+    if not isinstance(g, str):
+        raise TypeError("g must be a non-empty string")
+    ascii_code = [ord(i) for i in g]
+    if any([i > 122 or i < 97 for i in ascii_code]):
+        raise ValueError("Only lowercase letters are allowed in the generator")
+    return sum([2 ** (i - 97) for i in ascii_code])
