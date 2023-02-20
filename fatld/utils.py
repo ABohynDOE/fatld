@@ -10,31 +10,6 @@ import numpy as np
 import oapackage as oa  # type: ignore
 
 
-def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
-    """
-    Create a matrix containing `k` basic factors.
-
-    Parameters
-    ----------
-    k : int
-        Number of basic factors
-    zero_coding : bool, optional
-        The matrix is in 0/1 coding instead of -1/1 coding, by default True
-
-    Returns
-    -------
-    np.ndarray
-        A `2^k` by `k` matrix, containing the `k` basic factors
-    """
-    mat = np.zeros((2 ** k, k), dtype=int)
-    for i in range(k):
-        unit = [0] * (2 ** k // 2 ** (i + 1)) + [1] * (2 ** k // 2 ** (i + 1))
-        mat[:, i] = unit * 2 ** i
-    if not zero_coding:
-        mat = (mat * 2) - 1
-    return mat
-
-
 def power2_decomposition(n: int, length: Optional[int] = None) -> List[int]:
     """
     Decompose a number into powers of 2 and returns the corresponding indices.
@@ -74,32 +49,6 @@ def power2_decomposition(n: int, length: Optional[int] = None) -> List[int]:
     elif length is not None and len(powers) > length:
         warnings.warn("Power list larger than supplied length", UserWarning)
     return powers
-
-
-def custom_design(runsize: int, column_list: List[int]) -> np.ndarray:
-    """
-    Create a custom design with a specific run size, based on the column numbers
-    provided.
-
-    Parameters
-    ----------
-    runsize : int
-        Number of runs
-    column_list : List[int]
-        Column numbers to be used for the design
-
-    Returns
-    -------
-    np.ndarray
-        Design matrix with the factors corresponding to the columns given (and
-        in the same order)
-    """
-    k = int(np.log2(runsize))
-    bf_mat = basic_factor_matrix(k, zero_coding=True)
-    power_list = [power2_decomposition(n=col, length=k) for col in column_list]
-    yates_matrix = np.array(power_list).T
-    custom_mat = (bf_mat @ yates_matrix) % 2
-    return custom_mat
 
 
 def twlp(

@@ -1,9 +1,9 @@
 import re
 from collections import Counter
 from itertools import combinations, chain
-from typing import List, Optional
+from typing import List, Optional, Union
 
-from .main import power2_decomposition
+from .design import power2_decomposition
 
 
 def num2gen(n: int, m: Optional[int] = None) -> str:
@@ -218,7 +218,7 @@ class Relation:
         else:
             return full_relation
 
-    def word_length_pattern(self) -> List[List[int]]:
+    def word_length_pattern(self) -> Union[List[List[int]], List[int]]:
         """
         Compute the type-specific word length pattern of the defining relation.
 

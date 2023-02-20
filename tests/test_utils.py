@@ -6,7 +6,8 @@ import pytest  # type: ignore
 
 import fatld
 from fatld import Design
-from fatld.main import basic_factor_matrix, power2_decomposition, twlp
+from fatld.design import basic_factor_matrix, power2_decomposition
+from fatld.utils import twlp
 
 
 def test_version():
