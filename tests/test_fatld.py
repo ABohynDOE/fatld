@@ -6,7 +6,7 @@ import pytest  # type: ignore
 
 import fatld
 from fatld import Design
-from fatld.main import basic_factor_matrix, gen2num, num2gen, power2_decomposition, twlp
+from fatld.main import basic_factor_matrix, power2_decomposition, twlp
 
 
 def test_version():
@@ -65,36 +65,3 @@ class TestTWLP:
     def test_twlp_length_wrong(self):
         with pytest.warns(UserWarning):
             twlp(self.ar, max_length=2)
-
-
-class TestNum2Gen:
-    def test_num2gen(self):
-        assert num2gen(7) == "abc"
-
-    def test_num2gen_mvalue1(self):
-        assert num2gen(7, m=1) == "A3c"
-
-    def test_num2gen_mvalue2(self):
-        assert num2gen(13, m=2) == "A1B3"
-
-    def test_num2gen_typeerror(self):
-        with pytest.raises(TypeError):
-            num2gen("a")
-
-    def test_num2gen_valueerror(self):
-        with pytest.raises(ValueError):
-            num2gen(7, m=4)
-
-
-def test_gen2num():
-    assert gen2num("acd") == 13
-
-
-def test_gen2num_type_error():
-    with pytest.raises(TypeError):
-        gen2num(7)
-
-
-def test_gen2num_value_error():
-    with pytest.raises(ValueError):
-        gen2num("Abc")

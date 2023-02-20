@@ -3,7 +3,6 @@ Functions to create a FATL design
 
 Author: Alexandre Bohyn
 """
-# %% Packages
 import warnings
 from typing import List, Optional
 
@@ -27,10 +26,10 @@ def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
     np.ndarray
         A `2^k` by `k` matrix, containing the `k` basic factors
     """
-    mat = np.zeros((2**k, k), dtype=int)
+    mat = np.zeros((2 ** k, k), dtype=int)
     for i in range(k):
-        unit = [0] * (2**k // 2 ** (i + 1)) + [1] * (2**k // 2 ** (i + 1))
-        mat[:, i] = unit * 2**i
+        unit = [0] * (2 ** k // 2 ** (i + 1)) + [1] * (2 ** k // 2 ** (i + 1))
+        mat[:, i] = unit * 2 ** i
     if not zero_coding:
         mat = (mat * 2) - 1
     return mat
@@ -172,96 +171,3 @@ def twlp(
         return [x[::-1] for x in wlp_type_list]
     else:
         return wlp_type_list
-
-
-def num2gen(n: int, m: Optional[int] = None) -> str:
-    """Return the generator corresponding to a given column number
-
-    If a value is provided for the number of four-level factors, the pseudo-factors
-    used to generate the four-level factors will be replaced by their corresponding
-    labels in the generator.
-    The labels are:
-
-    - A1=a, A2=b, A3=ab for the first factor
-    - B1=c, B2=d, B3=cd for the second factor
-    - C1=e, C2=f, C3=ef for the third factor
-
-    Parameters
-    ----------
-    n : int
-        Column number
-
-    m : Optional[int]
-        Number of four-level factors. If no value is provided, the generator will be
-        considered to come from a two-level design. Default is None.
-
-    Returns
-    -------
-    str
-        Corresponding generator
-
-    Examples
-    ------
-    >>> num2gen(7)
-    'abc'
-    >>> num2gen(7, m=1)
-    'A1c'
-
-    See Also
-    --------
-    gen2num : Convert a generator into the corresponding column number
-    """
-    if not isinstance(n, int):
-        raise TypeError("n must be an integer")
-    if m is not None and m not in [1, 2, 3]:
-        raise ValueError("Only accepted values for m are 1, 2, 3")
-    powers = power2_decomposition(n)
-    word = "".join([chr(97 + i) for i, x in enumerate(powers) if x == 1])
-    if m is None:
-        return word
-    else:
-        for i in range(m):
-            pseudo_factors = [
-                chr(97 + 2 * i),
-                chr(97 + 2 * i + 1),
-                f"{chr(97+2*i)}{chr(97+2*i+1)}",
-            ]
-            pf_labels = [f"{chr(65+i)}{x}" for x in [1, 2, 3]]
-            word = (
-                word.replace(pseudo_factors[2], pf_labels[2])
-                .replace(pseudo_factors[1], pf_labels[1])
-                .replace(pseudo_factors[0], pf_labels[0])
-            )
-        return word
-
-
-def gen2num(g: str) -> int:
-    """Convert a generator into its corresponding column number
-
-    Generators can only contain lowercase letters from a to z.
-
-    Parameters
-    ----------
-    g : str
-        Generator
-
-    Returns
-    -------
-    int
-        Corresponding column number
-
-    Examples
-    --------
-    >>> gen2num('acd')
-    13
-
-    See Also
-    --------
-    num2gen : Convert a column number into its corresponding generator
-    """
-    if not isinstance(g, str):
-        raise TypeError("g must be a non-empty string")
-    ascii_code = [ord(i) for i in g]
-    if any([i > 122 or i < 97 for i in ascii_code]):
-        raise ValueError("Only lowercase letters are allowed in the generator")
-    return sum([2 ** (i - 97) for i in ascii_code])

@@ -8,11 +8,14 @@ This class has a :meth:`fatld.design.Design.wlp` method.
 Contents
 ++++++++
 
+
 .. toctree::
    :maxdepth: 2
 
-   word
+   factors
+   designs
    documentation
+   references
 
 Indices and tables
 ==================
