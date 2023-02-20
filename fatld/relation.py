@@ -180,6 +180,9 @@ class Relation:
         self.words = words
         self.relabel_words = [relabel_word(word=w, m=self.m) for w in self.words]
 
+    def __repr__(self):
+        return f"{self.words}"
+
     def expand(self, relabel: bool = False) -> List[str]:
         """
         Expand a defining subgroup into the complete defining relation.

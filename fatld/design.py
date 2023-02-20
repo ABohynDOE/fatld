@@ -6,6 +6,7 @@ import numpy as np
 import oapackage as oa  # type: ignore
 
 from .utils import twlp, power2_decomposition
+from .relation import num2gen, Relation
 
 
 def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
@@ -410,52 +411,22 @@ class Design:
             sep="\n",
         )
 
-    def defining_relation(self, raw: bool = False) -> List[str]:
+    def defining_relation(self) -> Relation:
         """
         Generate the defining relation of the design.
 
         For each added factor, generate the word representing the added factor.
-        Each word contains the generator + the letter representing the added factor.
-        The pseudo-factors used to generate the four-level factors are replaced by
-        four-level factors labels in the final words.
-        For example, if factor `A` is created using pseudo-factors `a`, `b` and `ab`,
-        then the replacement scheme is: `a -> A1`, `b -> A2`, and `ab -> A3`.
-
-        Parameters
-        ----------
-        raw : bool, optional
-            Return the relation without replacing the pseudo-factors by their four-level
-            factor label, by default False
+        Each word contains the generator used to create the added factor, and the letter
+        representing the added factor.
 
         Returns
         -------
-        List[str]
-            Defining relation as a list of words
+        Relation
+            A ``Relation`` object, holding the defining relation of the design
         """
-        letters = [chr(97 + i) for i in range(self.k)]
-        added_factors = [chr(97 + self.k + i) for i in range(self.p)]
-        relation = []
-        for idx, col in enumerate(self.af):
-            col_powers = power2_decomposition(col, length=self.k)
-            word = "".join([letters[i] for i, x in enumerate(col_powers) if x == 1])
-            relation.append(f"{word}{added_factors[idx]}")
-        if raw:
-            return relation
-        for i in range(self.m):
-            pf_factors = [
-                chr(97 + 2 * i),
-                chr(97 + 2 * i + 1),
-                f"{chr(97+2*i)}{chr(97+2*i+1)}",
-            ]
-            pf_labels = [f"{chr(65+i)}{x}" for x in [1, 2, 3]]
-            # We start with p1p2 to avoid replacing p1/p2 first and not the interaction
-            relation = [
-                s.replace(pf_factors[2], pf_labels[2])
-                .replace(pf_factors[1], pf_labels[1])
-                .replace(pf_factors[0], pf_labels[0])
-                for s in relation
-            ]
-        return relation
+        generators = [num2gen(i) for i in self.af]
+        words = [f"{x}{chr(97 + self.k + i)}" for i, x in enumerate(generators)]
+        return Relation(words=words, m=self.m)
 
     def add_factor(self, number: int):
         """

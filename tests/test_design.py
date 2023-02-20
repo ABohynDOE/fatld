@@ -7,6 +7,8 @@ Author: Alexandre Bohyn
 import fatld
 import numpy as np
 
+from fatld.relation import Relation
+
 
 class TestDesignErrors:
     def test_wrong_init(self):
@@ -36,3 +38,12 @@ class TestDesignMethods:
     def test_flatten_zero_coding(self):
         flat_array = self.design.flatten(zero_coding=False)
         assert all(np.unique(flat_array) == [-1, 1])
+
+    def test_defining_relation(self):
+        words = [
+            "acdef",  # 29 + f
+            "bdeg",  # 26 + g
+            "bceh",  # 22 + h
+        ]
+        r = Relation(words=words, m=1)
+        assert self.design.defining_relation().words == r.words
