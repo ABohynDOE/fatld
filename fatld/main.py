@@ -3,7 +3,6 @@ Functions to create a FATL design
 
 Author: Alexandre Bohyn
 """
-# %% Packages
 import warnings
 from typing import List, Optional
 
@@ -25,12 +24,12 @@ def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        Basic factor matrix
+        A `2^k` by `k` matrix, containing the `k` basic factors
     """
-    mat = np.zeros((2**k, k), dtype=int)
+    mat = np.zeros((2 ** k, k), dtype=int)
     for i in range(k):
-        unit = [0] * (2**k // 2 ** (i + 1)) + [1] * (2**k // 2 ** (i + 1))
-        mat[:, i] = unit * 2**i
+        unit = [0] * (2 ** k // 2 ** (i + 1)) + [1] * (2 ** k // 2 ** (i + 1))
+        mat[:, i] = unit * 2 ** i
     if not zero_coding:
         mat = (mat * 2) - 1
     return mat

@@ -12,7 +12,6 @@ class Design:
     """
     Regular design with four- and two-level factors.
 
-    ...
 
     Attributes
     ----------
@@ -96,7 +95,7 @@ class Design:
         # Added factors cannot be used in pseudo-factors
         if any([i in chain(*self.pf) for i in cols]):
             raise ValueError(
-                f"""Some column numbers are used to define pseudo-factors 
+                f"""Some column numbers are used to define pseudo-factors
                 for the four-level factor: {self.pf}"""
             )
         # User should know if columns are basic factors
@@ -226,9 +225,10 @@ class Design:
         Compute clearance of all two-factor interactions in the design.
 
         There are three types of two-factor interactions in a design:
+
         - 4-4: interaction between two pseudo-factors of four-level factors
-        - 4-2: interaction between a pseudo-factor of a four-level factor and a
-               two-level factor.
+        - 4-2: interaction between a pseudo-factor of a four-level factor and
+          a two-level factor.
         - 2-2: interaction between two two-level factors.
 
         An interaction is called clear when it is not aliased with any other interaction
@@ -246,10 +246,11 @@ class Design:
         A dictionary where each entry corresponds to an interaction of the design,
         where the key is the name of the interaction, and the value is another
         dictionary containing four entries:
-        - '4-4': the interaction is '4-4' clear (True or False)
-        - '4-2': the interaction is '4-2' clear (True or False)
-        - '2-2': the interaction is '2-2' clear (True or False)
-        - 'Type': the type of the interaction, either '4-4', '4-2', or '2-2'
+
+            - '4-4': the interaction is '4-4' clear (True or False)
+            - '4-2': the interaction is '4-2' clear (True or False)
+            - '2-2': the interaction is '2-2' clear (True or False)
+            - 'Type': the type of the interaction, either '4-4', '4-2', or '2-2'
 
         """
         # 4lvl PF are labeled as uppercase + number
