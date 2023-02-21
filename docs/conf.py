@@ -12,7 +12,6 @@
 
 import os
 import sys
-import pkg_resources  # type: ignore
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -34,9 +33,15 @@ release = "0.1.0"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "myst_parser",
     "sphinx_copybutton",
     "sphinxcontrib.bibtex",
 ]
+
+myst_enable_extensions = [
+    "dollarmath"
+]
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
