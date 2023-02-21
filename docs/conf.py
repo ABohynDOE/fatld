@@ -23,7 +23,8 @@ copyright = "2023, Alexandre Bohyn"
 author = "Alexandre Bohyn"
 
 # The full version, including alpha/beta/rc tags
-release = pkg_resources.get_distribution("fatld").version
+# release = pkg_resources.get_distribution("fatld").version
+release = "0.1.0"
 
 # -- General configuration ---------------------------------------------------
 
