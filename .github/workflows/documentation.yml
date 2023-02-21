@@ -12,9 +12,11 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx sphinx_rtd_theme
+      - name: Poetry Install
+        uses: knowsuchagency/poetry-install@v2
       - name: Sphinx build
         run: |
-          sphinx-build docs _build
+          poetry sphinx-build docs _build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
