@@ -13,3 +13,10 @@
 .. autoclass:: fatld.relation.Relation
     :members:
 ```
+
+## Design
+
+```{eval-rst}
+.. autoclass:: fatld.design.Design
+    :members:
+```

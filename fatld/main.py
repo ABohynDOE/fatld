@@ -1,8 +1,3 @@
-"""
-Functions to create a FATL design
-
-Author: Alexandre Bohyn
-"""
 import warnings
 from typing import List, Optional
 

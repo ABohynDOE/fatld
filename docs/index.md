@@ -8,6 +8,19 @@ You can explore aliasing relationships using *words* and *defining relations*
    :maxdepth: 2
 
    factors
+   words
+   relation
+
+```
+
+And create designs too
+
+```{eval-rst}
+.. toctree::
+   :caption: Design
+   :maxdepth: 2
+
+   design
 
 ```
 
@@ -22,5 +35,6 @@ As well as an index of all the function and a search page:
    :caption: Module documentation
    :maxdepth: 2
 
+   references
    documentation
 ```
