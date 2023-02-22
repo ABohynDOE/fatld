@@ -21,6 +21,8 @@ And create designs too
    :maxdepth: 2
 
    design
+   wlp
+   tfi
 
 ```
 

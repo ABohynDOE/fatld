@@ -38,10 +38,9 @@ extensions = [
     "sphinxcontrib.bibtex",
 ]
 
-myst_enable_extensions = [
-    "dollarmath"
-]
+myst_enable_extensions = ["dollarmath"]
 
+pygments_style = "sphinx"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

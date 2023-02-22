@@ -21,10 +21,10 @@ def basic_factor_matrix(k: int, zero_coding: bool = True) -> np.ndarray:
     np.ndarray
         A `2^k` by `k` matrix, containing the `k` basic factors
     """
-    mat = np.zeros((2 ** k, k), dtype=int)
+    mat = np.zeros((2**k, k), dtype=int)
     for i in range(k):
-        unit = [0] * (2 ** k // 2 ** (i + 1)) + [1] * (2 ** k // 2 ** (i + 1))
-        mat[:, i] = unit * 2 ** i
+        unit = [0] * (2**k // 2 ** (i + 1)) + [1] * (2**k // 2 ** (i + 1))
+        mat[:, i] = unit * 2**i
     if not zero_coding:
         mat = (mat * 2) - 1
     return mat
@@ -51,10 +51,10 @@ def power2_decomposition(n: int, length: Optional[int] = None) -> List[int]:
     -------
     >>> # 7 can be decomposed into 1*2 + 1*2 + 1*4
     >>> power2_decomposition(7)
-    [1,1,1]
+    [1, 1, 1]
     >>> # 11 can be decomposed into 1*1 + 1*2 + 0*4 + 1*8, we want a list of length 7
     >>> power2_decomposition(11, length=7)
-    [1,1,0,1,0,0,0]
+    [1, 1, 0, 1, 0, 0, 0]
     """
     powers = []
     i = 1

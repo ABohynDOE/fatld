@@ -14,6 +14,8 @@
     :members:
 ```
 
+(design-documentation)=
+
 ## Design
 
 ```{eval-rst}

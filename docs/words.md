@@ -24,6 +24,10 @@ This function works for words containing only two-level factors and words contai
 4
 ```
 
+```{tip}
+Do not forget to add the letter corresponding to the added factor at the end of the generator, else the length will be off be one !
+```
+
 ## Type
 
 The type of a word can be computed using the function {func}`fatld.relation.word_type`.
