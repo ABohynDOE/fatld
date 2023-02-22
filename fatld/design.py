@@ -1,5 +1,6 @@
 import warnings
 from itertools import chain, combinations
+from collections import defaultdict
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -12,6 +13,15 @@ class Design:
     """
     Regular design with four- and two-level factors.
 
+    Parameters
+    ----------
+    runsize : int
+        Number of runs
+    m : int
+        Number of four-level factors
+    cols: List[int]
+        List of the added factors of the design. Cannot contain columns used
+        in four-level factors and basic factors.
 
     Attributes
     ----------
@@ -40,17 +50,6 @@ class Design:
     def __init__(self, runsize: int, m: int, cols: List[int]):
         # TODO: think about a `strict` keyword
         # it would bypass columns check and uses only the columns suplied
-        """
-        Parameters
-        ----------
-        runsize : int
-            Number of runs
-        m : int
-            Number of four-level factors
-        cols: List[int]
-            List of the added factors of the design. Cannot contain columns used
-            in four-level factors and basic factors.
-        """
         # Run size value check
         if not isinstance(runsize, int) or runsize <= 0:
             raise TypeError("Runsize must be a positive integer")
@@ -334,30 +333,37 @@ class Design:
             tfi[tfi_label][alias_type] = False
         return tfi
 
-    def clearance_summary(self):
-        """
-        Print the ratio of '4-4', '4-2', '2-2', and totally clear (TC) interations of
-        the design.
-        """
+    def clarity(self):
         tfi = self.tfi_clearance()
-        ff = ft = tt = tc = 0
-        for k, v in tfi.items():
-            if v["4-4"]:
-                ff += 1
-            if v["4-2"]:
-                ft += 1
-            if v["2-2"]:
-                tt += 1
-            if v["4-4"] and v["4-2"] and v["2-2"]:
-                tc += 1
-        print(
-            f"In total: {len(tfi)} two-factor interactions",
-            f"4-4 clear: {ff}",
-            f"4-2 clear: {ft}",
-            f"2-2 clear: {tt}",
-            f"Totally clear: {tc}",
-            sep="\n",
-        )
+        tfi_dict = defaultdict(list)
+        for key, value in tfi.items():
+            for int_type in ["4-4", "4-2", "2-2"]:
+                if value[int_type]:
+                    tfi_dict[int_type].append(key)
+        # tfi_len_dict = {k: len(v) for k, v in tfi_dict.items()}
+        return tfi_dict
+
+    def clear(self, interaction_type: str, clear_from: str) -> int:
+        # TODO: add a 'all' kw that counts for all interactions
+        possible_types = ["4-4", "4-2", "2-2", "all"]
+        if interaction_type not in possible_types or clear_from not in possible_types:
+            raise ValueError(
+                """
+                Wrong type of interaction provided.
+                Must be one of '4-4', '4-2', '2-2' or 'all'.
+                """
+            )
+        tfi = self.tfi_clearance()
+        count = 0
+        for _, value in tfi.items():
+            if interaction_type != "all" and value["Type"] != interaction_type:
+                continue
+            if clear_from == "all":
+                if all([value[t] for t in ["4-4", "4-2", "2-2"]]):
+                    count += 1
+            elif value[clear_from]:
+                count += 1
+        return count
 
     def defining_relation(self, raw: bool = False) -> List[str]:
         """
@@ -434,3 +440,5 @@ class Design:
             raise ValueError(f"Column number {number} already used in the design")
         new_cols = self.af + [number]
         return Design(self.runsize, self.m, new_cols)
+
+    # TODO: def remove_factor
