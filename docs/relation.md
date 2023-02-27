@@ -1,37 +1,57 @@
 # Defining relation
 
-The aliasing pattern of a design can be summarized by a **defining relation** that contains all the words associated with the added factors of the design.
-Defining relations have two interesting features:
+The aliasing of all the factors of a design can be summarized by a **defining relation**.
+The defining relation of a design contains all the words used to generate the added factors of the design.
+Therefore, it uniquely defines any regular design.
 
-- **Expansion**: expand the relation containing $p$ words to the full defining relation containing $2^{p}-1$ words.
-- **Word length pattern**: compute the word length pattern of the design based on the full defining relation.
+For example, consider the 32-run design with one four-level factor $A$, and two added two-level factors 27 and 30.
+Since the design involves 32 runs, there are 5 basic factors ($a$ to $e$), so that the added factors are labeled $f$ and $g$.
+The column numbers, 27 and 30, correspond to the generators $abde$ and $bcde$, respectively.
+After relabeling the pseudo-factors, the generators become $A_3de$ and $A_2cde$.
+Therefore, the defining relation of the design can be written as
+$$
+\{ A_3def, \; A_2cdeg \}
+$$
 
-For example, consider the 64-run design with two four-level factors, $A$ and $B$, and three added two-level factors: 21, 42, and 53.
-Since the design involves 64 runs, there are 6 basic factors ($a$ to $f$), so that the four added factors are labeled $g$, $h$, and $i$.
-Using the four generators and the four labels, we can create the defining relation of the design using the {class}`fatld.relation.Relation` class that create a ``Relation`` object, which holds a defining relation.
+In the ``fatld`` package, we can create the defining relation of the design using the {class}`fatld.relation.Relation` class that create a ``Relation`` object, which holds a defining relation.
 
 ```python
 >>> from fatld.relation import Relation, num2gen
->>> added_factors = [21, 42, 53]
->>> letters = [chr(97+6+i) for i in range(4)]
->>> subgroup = [f"{num2gen(x)}{letters[i]}" for i,x in enumerate(added_factors)]
->>> subgroup
-['aceg', 'bdfh', 'acefi']
->>> r = Relation(subgroup, m=2)
+>>> added_factors = [27, 30]
+>>> letters = ['f', 'g']
+>>> words = [num2gen(x) + letters[i] for i,x in enumerate(added_factors)]
+>>> words
+['abdef', 'bcdeg']
+>>> # We specify `m` so that the words can be relabeled
+>>> r = Relation(words, m=1)
 >>> r
-['A1B1eg', 'A2B2fh', 'A1B1efi']
+['A3def', 'A2cdeg']
 ```
 
-This class has two methods {meth}`fatld.relation.Relation.expand` and {meth}`fatld.relation.Relation.word_length_pattern` that allow you to expand the defining relation, and to compute its word length pattern, respectively.
+````{tip}
+If you are using a ``Design`` object, created using {class}`fatld.design.Design`, you can obtain the defining relation of the design using the {meth}`fatld.design.Design.defining_relation` method, instead of creating it by hand.
+````
+
+## Expanding
+
+Two or more words multiplied together can generate another word.
+This means that a defining relation with $k$ words can be expanded to $2^k-1$ words in total, by multliplying all the words together.
+All the aliasing between the factors of a design can be infered from such an expanded relation.
 
 ```python
 >>> full_relation = r.expand(relabel=True)
 >>> full_relation
-['A1B1eg', 'A2B2fh', 'A1B1efi', 'A3B3efgh', 'fgi', 'A3B3ehi', 'A2B2ghi']
+['A3def', 'A2cdeg', 'A1cfg']
+```
+
+When the full expanded relation is too long you can summarise it using the word length pattern.
+This pattern counts the number of words of each type and each length.
+
+```{code} python
 >>> [word_length(w) for w in full_relation]
-[4, 4, 5, 6, 3, 5, 5]
+[4, 5, 4]
 >>> [word_type(w) for w in full_relation]
-[2, 2, 2, 2, 0, 2, 2]
+[1, 1, 1]
 >>> r.word_length_pattern()
-[[1, 0, 0], [0, 0, 2], [0, 0, 3], [0, 0, 1]]
+[[0, 0], [0, 2], [0, 1]]
 ```
