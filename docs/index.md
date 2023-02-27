@@ -35,8 +35,14 @@ As well as an index of all the function and a search page:
 ```{eval-rst}
 .. toctree::
    :caption: Module documentation
-   :maxdepth: 2
+   :maxdepth: 1
 
    references
    documentation
 ```
+
+(contact)=
+
+## Contact
+
+For any questions/suggestions related to this project, you can contact me at [alexandre dot bohyn at kuleuven dot be](mailto:alexandre.bohyn@kuleuven.be).

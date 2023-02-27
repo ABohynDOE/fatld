@@ -35,7 +35,7 @@ Columns are always sorted by numbers so basic factors will not always be first i
 [5, 13, 16, 17, 27, 32]
 ```
 
-## Basic design information
+## Characteristics
 
 Several information about a design are available as attributes of the ``Design`` object.
 The list includes:
