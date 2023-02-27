@@ -46,7 +46,8 @@ This function works for words containing both two-level factors and pseudo-facto
 0
 >>> word_type('A1cdg')
 1
->>> word_type(relabel_word('acdeg', m=2)) #  acdeg relabeled becomes A1C3eg since A1 = a and C3 = cd
+>>> # acdeg relabeled (with 2 four-level factors) is A1C3eg
+>>> word_type(relabel_word('acdeg', m=2))
 2
 ```
 
