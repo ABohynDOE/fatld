@@ -42,6 +42,8 @@ myst_enable_extensions = ["dollarmath"]
 
 pygments_style = "sphinx"
 
+autodoc_mock_imports = ["numpy", "oapackage"]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
