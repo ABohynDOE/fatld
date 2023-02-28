@@ -1,10 +1,10 @@
 import warnings
 from itertools import chain, combinations
-from collections import defaultdict
 from typing import Dict, List, Optional
 
 import numpy as np
 import oapackage as oa  # type: ignore
+import pandas as pd  # type: ignore
 
 from .main import basic_factor_matrix, custom_design, power2_decomposition, twlp
 
@@ -47,6 +47,7 @@ class Design:
         Number of two-level factors in the design
     """
 
+    # TODO: refactor the docstring of the Design class
     def __init__(self, runsize: int, m: int, cols: List[int]):
         # TODO: think about a `strict` keyword
         # it would bypass columns check and uses only the columns suplied
@@ -79,7 +80,7 @@ class Design:
         ]
 
         # Available basic factors are the ones not used in the four-level factors
-        all_basic_factors = [2**i for i in range(self.k)]
+        all_basic_factors = [2 ** i for i in range(self.k)]
         self.bf = [i for i in all_basic_factors if i not in chain(*self.pf)]
 
         # Cols value check
@@ -120,7 +121,7 @@ class Design:
         for i in range(self.m):
             idx = [2 * i, ((2 * i) + 1)]
             coeff_matrix_4lvl[idx, i] = [2, 1]
-        four_lvl_part = bf_matrix[:, 0 : (2 * self.m)] @ coeff_matrix_4lvl
+        four_lvl_part = bf_matrix[:, 0: (2 * self.m)] @ coeff_matrix_4lvl
         # 2-level part
         two_lvl_part = custom_design(self.runsize, self.cols)
         # Assemble into one matrix
@@ -133,7 +134,7 @@ class Design:
         return f"Design(runsize={self.runsize}, m={self.m}, cols={self.af})"
 
     def twlp(
-        self, type_0: bool = True, max_length: Optional[int] = None
+            self, type_0: bool = True, max_length: Optional[int] = None
     ) -> List[List[int]]:
         """Type-specific word length pattern
 
@@ -187,7 +188,7 @@ class Design:
         elif max_length is None:
             return wlp_list
         else:
-            return wlp_list[0 : (max_length - 2)]
+            return wlp_list[0: (max_length - 2)]
 
     def flatten(self, zero_coding: bool = True) -> np.ndarray:
         """
@@ -213,7 +214,7 @@ class Design:
             flat_4lvl_part[:, (3 * i + 2)] = np.logical_not(
                 np.logical_xor(self.array[:, i] > 1, self.array[:, i] % 2 == 0)
             )
-        mat = np.concatenate((flat_4lvl_part, self.array[:, self.m :]), axis=1)
+        mat = np.concatenate((flat_4lvl_part, self.array[:, self.m:]), axis=1)
         if zero_coding is False:
             return mat * 2 - 1
         else:
@@ -281,9 +282,9 @@ class Design:
         label_list_tfi = label_list_44_tfi + label_list_42_tfi + label_list_22_tfi
         # tfi can be one of three types: 4-4, 4-2, or 2-2
         type_list_tfi = (
-            ["4-4"] * len(label_list_44_tfi)
-            + ["4-2"] * len(label_list_42_tfi)
-            + ["2-2"] * len(label_list_22_tfi)
+                ["4-4"] * len(label_list_44_tfi)
+                + ["4-2"] * len(label_list_42_tfi)
+                + ["2-2"] * len(label_list_22_tfi)
         )
         # All alias-related variables are NA and will be filled later on
         tfi = dict()
@@ -334,17 +335,30 @@ class Design:
         return tfi
 
     def clarity(self):
+        # TODO: add documentation
+        clarity_matrix = np.zeros((4, 4), dtype=int)
+        clarity_df = pd.DataFrame(
+            clarity_matrix,
+            columns=["4-4 clear", "4-2 clear", "2-2 clear", "Totally clear"],
+            index=["4-4", "4-2", "2-2", "Any type"],
+        )
         tfi = self.tfi_clearance()
-        tfi_dict = defaultdict(list)
-        for key, value in tfi.items():
-            for int_type in ["4-4", "4-2", "2-2"]:
-                if value[int_type]:
-                    tfi_dict[int_type].append(key)
-        # tfi_len_dict = {k: len(v) for k, v in tfi_dict.items()}
-        return tfi_dict
+        for interaction in tfi.values():
+            int_type = interaction['Type']
+            all_clear = 0
+            for clear_type in ["4-4", "4-2", "2-2"]:
+                if interaction[clear_type]:
+                    column_label = f"{clear_type} clear"
+                    clarity_df.loc[int_type, column_label] += 1
+                    clarity_df.loc["Any type", column_label] += 1
+                    all_clear += 1
+                if all_clear == 3:
+                    clarity_df.loc[int_type, "Totally clear"] += 1
+                    clarity_df.loc["Any type", "Totally clear"] += 1
+        return clarity_df
 
     def clear(self, interaction_type: str, clear_from: str) -> int:
-        # TODO: add a 'all' kw that counts for all interactions
+        # TODO: add documentation
         possible_types = ["4-4", "4-2", "2-2", "all"]
         if interaction_type not in possible_types or clear_from not in possible_types:
             raise ValueError(
@@ -400,9 +414,9 @@ class Design:
             pf_factors = [
                 chr(97 + 2 * i),
                 chr(97 + 2 * i + 1),
-                f"{chr(97+2*i)}{chr(97+2*i+1)}",
+                f"{chr(97 + 2 * i)}{chr(97 + 2 * i + 1)}",
             ]
-            pf_labels = [f"{chr(65+i)}{x}" for x in [1, 2, 3]]
+            pf_labels = [f"{chr(65 + i)}{x}" for x in [1, 2, 3]]
             # We start with p1p2 to avoid replacing p1/p2 first and not the interaction
             relation = [
                 s.replace(pf_factors[2], pf_labels[2])
