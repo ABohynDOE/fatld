@@ -22,6 +22,7 @@ jobs:
           cache: "pip"
       - run: pip install numpy==1.24.2
       - run: pip install -r requirements.txt
+      - run: pip install pytest
       - name: Test with pytest
         run: |
           pytest tests
