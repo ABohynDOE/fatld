@@ -2,7 +2,16 @@
 name = "fatld"
 version = "0.1.0"
 description = "Generate and characterize designs with four-and-two-level (FATL) factors"
-authors = ["ABohynDOE <alexandre.bohyn@kuleuven.be>"]
+authors = ["Alexandre Bohyn <alexandre.bohyn@kuleuven.be>"]
+license = "MIT"
+homepage = "https://abohyndoe.github.io/fatld/"
+repository = "https://github.com/ABohynDOE/fatld"
+keywords = ["design", "doe"]
+classifiers = [
+	"Programming Language :: Python :: 3.8",
+	"Development Status :: 3 - Alpha"
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.8"

@@ -43,3 +43,4 @@ poetry/core/*
 ## User added
 .ruff_cache/
 htmlcov/
+*.ipynb

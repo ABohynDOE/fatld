@@ -35,7 +35,7 @@ As well as an index of all the function and a search page:
 ```{eval-rst}
 .. toctree::
    :caption: Module documentation
-   :maxdepth: 1
+   :maxdepth: 2
 
    references
    documentation
