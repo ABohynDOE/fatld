@@ -484,4 +484,25 @@ class Design:
         new_cols = self.af + [number]
         return Design(self.runsize, self.m, new_cols)
 
-    # TODO: def remove_factor
+    def remove_factor(self, number: int):
+        """
+        Remove a two-level factor from the design.
+
+        Parameters
+        ----------
+        number : int
+            Column number of the factor to remove. Must correspond to one of the factor
+            used in the design.
+
+        Returns
+        -------
+        Design
+            A `Design` object containing the added two-level factor
+
+        """
+        # Factor cannot be used in the columns, the pf or be out of range
+        if number not in self.cols:
+            raise ValueError(f"Column number {number} is not used in the design.")
+        new_cols = [i for i in self.cols]
+        new_cols.pop(number)
+        return Design(self.runsize, self.m, new_cols)
