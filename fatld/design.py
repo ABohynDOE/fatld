@@ -80,7 +80,7 @@ class Design:
         ]
 
         # Available basic factors are the ones not used in the four-level factors
-        all_basic_factors = [2 ** i for i in range(self.k)]
+        all_basic_factors = [2**i for i in range(self.k)]
         self.bf = [i for i in all_basic_factors if i not in chain(*self.pf)]
 
         # Cols value check
@@ -121,7 +121,7 @@ class Design:
         for i in range(self.m):
             idx = [2 * i, ((2 * i) + 1)]
             coeff_matrix_4lvl[idx, i] = [2, 1]
-        four_lvl_part = bf_matrix[:, 0: (2 * self.m)] @ coeff_matrix_4lvl
+        four_lvl_part = bf_matrix[:, 0 : (2 * self.m)] @ coeff_matrix_4lvl
         # 2-level part
         two_lvl_part = custom_design(self.runsize, self.cols)
         # Assemble into one matrix
@@ -134,7 +134,7 @@ class Design:
         return f"Design(runsize={self.runsize}, m={self.m}, cols={self.af})"
 
     def twlp(
-            self, type_0: bool = True, max_length: Optional[int] = None
+        self, type_0: bool = True, max_length: Optional[int] = None
     ) -> List[List[int]]:
         """Type-specific word length pattern
 
@@ -188,7 +188,7 @@ class Design:
         elif max_length is None:
             return wlp_list
         else:
-            return wlp_list[0: (max_length - 2)]
+            return wlp_list[0 : (max_length - 2)]
 
     def flatten(self, zero_coding: bool = True) -> np.ndarray:
         """
@@ -214,7 +214,7 @@ class Design:
             flat_4lvl_part[:, (3 * i + 2)] = np.logical_not(
                 np.logical_xor(self.array[:, i] > 1, self.array[:, i] % 2 == 0)
             )
-        mat = np.concatenate((flat_4lvl_part, self.array[:, self.m:]), axis=1)
+        mat = np.concatenate((flat_4lvl_part, self.array[:, self.m :]), axis=1)
         if zero_coding is False:
             return mat * 2 - 1
         else:
@@ -282,9 +282,9 @@ class Design:
         label_list_tfi = label_list_44_tfi + label_list_42_tfi + label_list_22_tfi
         # tfi can be one of three types: 4-4, 4-2, or 2-2
         type_list_tfi = (
-                ["4-4"] * len(label_list_44_tfi)
-                + ["4-2"] * len(label_list_42_tfi)
-                + ["2-2"] * len(label_list_22_tfi)
+            ["4-4"] * len(label_list_44_tfi)
+            + ["4-2"] * len(label_list_42_tfi)
+            + ["2-2"] * len(label_list_22_tfi)
         )
         # All alias-related variables are NA and will be filled later on
         tfi = dict()
@@ -334,8 +334,24 @@ class Design:
             tfi[tfi_label][alias_type] = False
         return tfi
 
-    def clarity(self):
-        # TODO: add documentation
+    def clarity(self) -> pd.DataFrame:
+        """
+        Generate the clarity matrix of the design.
+
+        The clarity matrix is a table where:
+
+        - the rows represent the type of the interactions (4-4, 4-2, 2-2,
+            or any type)
+        - the columns represent the type of clarity that the interactions can have (
+            4-4 clear, 4-2 clear, 2-2 clear, or totally clear)
+
+        Returns
+        -------
+        clarity_matrix
+            A pandas dataframe holding the clarity matrix where the rows are
+            ["4-4", "4-2", "2-2", "Any type"] and the columns are ["4-4 clear",
+            "4-2 clear", "2-2 clear", "Totally clear"]
+        """
         clarity_matrix = np.zeros((4, 4), dtype=int)
         clarity_df = pd.DataFrame(
             clarity_matrix,
@@ -344,7 +360,7 @@ class Design:
         )
         tfi = self.tfi_clearance()
         for interaction in tfi.values():
-            int_type = interaction['Type']
+            int_type = interaction["Type"]
             all_clear = 0
             for clear_type in ["4-4", "4-2", "2-2"]:
                 if interaction[clear_type]:
@@ -358,7 +374,20 @@ class Design:
         return clarity_df
 
     def clear(self, interaction_type: str, clear_from: str) -> int:
-        # TODO: add documentation
+        """
+        Compute the number of interactions of type `interaction_type` that are clear
+        from interactions of the `clear_from` type.
+
+        Parameters
+        ----------
+        interaction_type : str
+            Type of the interaction studied. Can either be "4-4", "4-2", "2-2", or "all"
+            to count for all types of interaction.
+        clear_from : str
+            Type of clarity to count. Can either be "4-4", "4-2", "2-2", or "all" to
+            count the number of totally clear interaction.
+
+        """
         possible_types = ["4-4", "4-2", "2-2", "all"]
         if interaction_type not in possible_types or clear_from not in possible_types:
             raise ValueError(
