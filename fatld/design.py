@@ -501,8 +501,10 @@ class Design:
 
         """
         # Factor cannot be used in the columns, the pf or be out of range
-        if number not in self.cols:
-            raise ValueError(f"Column number {number} is not used in the design.")
-        new_cols = [i for i in self.cols]
-        new_cols.pop(number)
+        if number not in self.af:
+            raise ValueError(
+                f"Column number {number} is not an added factor in the design."
+            )
+        new_cols = [i for i in self.af]
+        new_cols.remove(number)
         return Design(self.runsize, self.m, new_cols)
