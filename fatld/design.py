@@ -1,10 +1,10 @@
 import warnings
 from itertools import chain, combinations
-from collections import defaultdict
 from typing import Dict, List, Optional
 
 import numpy as np
 import oapackage as oa  # type: ignore
+import pandas as pd  # type: ignore
 
 from .main import basic_factor_matrix, custom_design, power2_decomposition, twlp
 
@@ -47,6 +47,7 @@ class Design:
         Number of two-level factors in the design
     """
 
+    # TODO: refactor the docstring of the Design class
     def __init__(self, runsize: int, m: int, cols: List[int]):
         # TODO: think about a `strict` keyword
         # it would bypass columns check and uses only the columns suplied
@@ -333,18 +334,60 @@ class Design:
             tfi[tfi_label][alias_type] = False
         return tfi
 
-    def clarity(self):
+    def clarity(self) -> pd.DataFrame:
+        """
+        Generate the clarity matrix of the design.
+
+        The clarity matrix is a table where:
+
+        - the rows represent the type of the interactions (4-4, 4-2, 2-2,
+            or any type)
+        - the columns represent the type of clarity that the interactions can have (
+            4-4 clear, 4-2 clear, 2-2 clear, or totally clear)
+
+        Returns
+        -------
+        clarity_matrix
+            A pandas dataframe holding the clarity matrix where the rows are
+            ["4-4", "4-2", "2-2", "Any type"] and the columns are ["4-4 clear",
+            "4-2 clear", "2-2 clear", "Totally clear"]
+        """
+        clarity_matrix = np.zeros((4, 4), dtype=int)
+        clarity_df = pd.DataFrame(
+            clarity_matrix,
+            columns=["4-4 clear", "4-2 clear", "2-2 clear", "Totally clear"],
+            index=["4-4", "4-2", "2-2", "Any type"],
+        )
         tfi = self.tfi_clearance()
-        tfi_dict = defaultdict(list)
-        for key, value in tfi.items():
-            for int_type in ["4-4", "4-2", "2-2"]:
-                if value[int_type]:
-                    tfi_dict[int_type].append(key)
-        # tfi_len_dict = {k: len(v) for k, v in tfi_dict.items()}
-        return tfi_dict
+        for interaction in tfi.values():
+            int_type = interaction["Type"]
+            all_clear = 0
+            for clear_type in ["4-4", "4-2", "2-2"]:
+                if interaction[clear_type]:
+                    column_label = f"{clear_type} clear"
+                    clarity_df.loc[int_type, column_label] += 1
+                    clarity_df.loc["Any type", column_label] += 1
+                    all_clear += 1
+                if all_clear == 3:
+                    clarity_df.loc[int_type, "Totally clear"] += 1
+                    clarity_df.loc["Any type", "Totally clear"] += 1
+        return clarity_df
 
     def clear(self, interaction_type: str, clear_from: str) -> int:
-        # TODO: add a 'all' kw that counts for all interactions
+        """
+        Compute the number of interactions of type `interaction_type` that are clear
+        from interactions of the `clear_from` type.
+
+        Parameters
+        ----------
+        interaction_type : str
+            Type of the interaction studied. Can either be "4-4", "4-2", "2-2", or "all"
+            to count for all types of interaction.
+        clear_from : str
+            Type of clarity to count. Can either be "4-4", "4-2", "2-2", or "all" to
+            count the number of totally clear interaction.
+
+        """
         possible_types = ["4-4", "4-2", "2-2", "all"]
         if interaction_type not in possible_types or clear_from not in possible_types:
             raise ValueError(
@@ -400,9 +443,9 @@ class Design:
             pf_factors = [
                 chr(97 + 2 * i),
                 chr(97 + 2 * i + 1),
-                f"{chr(97+2*i)}{chr(97+2*i+1)}",
+                f"{chr(97 + 2 * i)}{chr(97 + 2 * i + 1)}",
             ]
-            pf_labels = [f"{chr(65+i)}{x}" for x in [1, 2, 3]]
+            pf_labels = [f"{chr(65 + i)}{x}" for x in [1, 2, 3]]
             # We start with p1p2 to avoid replacing p1/p2 first and not the interaction
             relation = [
                 s.replace(pf_factors[2], pf_labels[2])
@@ -441,4 +484,27 @@ class Design:
         new_cols = self.af + [number]
         return Design(self.runsize, self.m, new_cols)
 
-    # TODO: def remove_factor
+    def remove_factor(self, number: int):
+        """
+        Remove a two-level factor from the design.
+
+        Parameters
+        ----------
+        number : int
+            Column number of the factor to remove. Must correspond to one of the factor
+            used in the design.
+
+        Returns
+        -------
+        Design
+            A `Design` object containing the added two-level factor
+
+        """
+        # Factor cannot be used in the columns, the pf or be out of range
+        if number not in self.af:
+            raise ValueError(
+                f"Column number {number} is not an added factor in the design."
+            )
+        new_cols = [i for i in self.af]
+        new_cols.remove(number)
+        return Design(self.runsize, self.m, new_cols)
