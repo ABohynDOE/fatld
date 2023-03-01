@@ -5,6 +5,7 @@ Created on: 09/02/2023
 Author: Alexandre Bohyn
 """
 import numpy as np
+import pandas as pd
 import pytest
 
 import fatld
@@ -62,3 +63,42 @@ class TestCols:
     def test_remove_wrong_cols(self):
         with pytest.raises(ValueError):
             self.design.remove_factor(17)
+
+
+class TestClarity:
+    design = fatld.Design(32, 1, [27, 29])
+    df = pd.DataFrame(
+        {
+            "4-4 clear": [0, 15, 10, 25],
+            "4-2 clear": [0, 15, 4, 19],
+            "2-2 clear": [0, 9, 10, 19],
+            "Totally clear": [0, 9, 4, 13],
+        },
+        dtype=int,
+    )
+    df = df.set_index(pd.Index(["4-4", "4-2", "2-2", "Any type"]))
+
+    def test_clarity(self):
+        tfi = self.design.clarity()
+        assert tfi.equals(self.df)
+
+    def test_clear(self):
+        assertion_list = []
+        for row in ["4-4", "4-2", "2-2"]:
+            if row == "Any type":
+                row_index = "all"
+            else:
+                row_index = row
+            for col in ["4-4 clear", "4-2 clear", "2-2 clear", "Totally clear"]:
+                if col == "Totally clear":
+                    col_index = "all"
+                else:
+                    col_index = col.replace(" clear", "")
+                assertion_list.append(
+                    self.design.clear(row_index, col_index) == self.df.loc[row, col]
+                )
+        assert all(assertion_list)
+
+    def test_clear_error(self):
+        with pytest.raises(ValueError):
+            self.design.clear("4-2", "4-3")
