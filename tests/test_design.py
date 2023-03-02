@@ -5,8 +5,8 @@ Created on: 09/02/2023
 Author: Alexandre Bohyn
 """
 import numpy as np
-import pandas as pd
-import pytest
+import pandas as pd  # type: ignore
+import pytest  # type: ignore
 
 import fatld
 
@@ -19,6 +19,7 @@ class TestDesignErrors:
 class TestDesignMethods:
     # Design 6 from Table 3 of Wu (1993)
     design = fatld.Design(runsize=32, m=1, cols=[29, 26, 22])
+    relation = fatld.relation.Relation(["bcef", "bdeg", "acdeh"], m=1)
 
     def test_twlp(self):
         twlp = self.design.twlp(max_length=5)
@@ -39,6 +40,10 @@ class TestDesignMethods:
     def test_flatten_zero_coding(self):
         flat_array = self.design.flatten(zero_coding=False)
         assert all(np.unique(flat_array) == [-1, 1])
+
+    def test_relation(self):
+        rel = self.design.defining_relation()
+        assert rel.words == self.relation.words
 
 
 class TestCols:
