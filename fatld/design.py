@@ -410,7 +410,7 @@ class Design:
                 count += 1
         return count
 
-    def defining_relation(self, raw: bool = False) -> List[str]:
+    def defining_relation(self, raw: bool = False):
         """
         Generate the defining relation of the design.
 
@@ -429,8 +429,8 @@ class Design:
 
         Returns
         -------
-        List[str]
-            Defining relation as a list of words
+        Relation
+            Defining relation as a ``Relation`` object.
         """
         relation = [
             f"{num2gen(x)}{chr(97 + self.k + i)}" for i, x in enumerate(self.af)

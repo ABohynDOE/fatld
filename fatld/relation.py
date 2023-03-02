@@ -250,5 +250,5 @@ class Relation:
             t = types[i]
             wlp[x][t] += 1
         if self.m == 0:
-            return list(chain(*wlp[3:]))
+            return list(chain(*wlp[3:]))  # type: ignore
         return wlp[3:]

@@ -5,8 +5,8 @@ Created on: 09/02/2023
 Author: Alexandre Bohyn
 """
 import numpy as np
-import pandas as pd
-import pytest
+import pandas as pd  # type: ignore
+import pytest  # type: ignore
 
 import fatld
 
