@@ -6,7 +6,8 @@ import numpy as np
 import oapackage as oa  # type: ignore
 import pandas as pd  # type: ignore
 
-from .main import basic_factor_matrix, custom_design, power2_decomposition, twlp
+from .main import basic_factor_matrix, custom_design, twlp
+from .relation import Relation, num2gen
 
 
 class Design:
@@ -108,6 +109,7 @@ class Design:
         self.p = len(cols)
         # List of added factors
         self.af = cols
+        self.af.sort()
         # List of all two-level columns in the design
         self.cols = self.bf + self.af
         self.cols.sort()
@@ -430,30 +432,10 @@ class Design:
         List[str]
             Defining relation as a list of words
         """
-        letters = [chr(97 + i) for i in range(self.k)]
-        added_factors = [chr(97 + self.k + i) for i in range(self.p)]
-        relation = []
-        for idx, col in enumerate(self.af):
-            col_powers = power2_decomposition(col, length=self.k)
-            word = "".join([letters[i] for i, x in enumerate(col_powers) if x == 1])
-            relation.append(f"{word}{added_factors[idx]}")
-        if raw:
-            return relation
-        for i in range(self.m):
-            pf_factors = [
-                chr(97 + 2 * i),
-                chr(97 + 2 * i + 1),
-                f"{chr(97 + 2 * i)}{chr(97 + 2 * i + 1)}",
-            ]
-            pf_labels = [f"{chr(65 + i)}{x}" for x in [1, 2, 3]]
-            # We start with p1p2 to avoid replacing p1/p2 first and not the interaction
-            relation = [
-                s.replace(pf_factors[2], pf_labels[2])
-                .replace(pf_factors[1], pf_labels[1])
-                .replace(pf_factors[0], pf_labels[0])
-                for s in relation
-            ]
-        return relation
+        relation = [
+            f"{num2gen(x)}{chr(97 + self.k + i)}" for i, x in enumerate(self.af)
+        ]
+        return Relation(words=relation, m=self.m)
 
     def add_factor(self, number: int):
         """

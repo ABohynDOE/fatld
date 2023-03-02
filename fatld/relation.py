@@ -163,6 +163,7 @@ def word_type(word: str) -> int:
 
 
 class Relation:
+    # TODO: document the relation class
     def __init__(self, words: List[str], m: int = 0):
         # `m` can only be 0, 1,2 or 3 since there can't be more four-level factors
         # 0 means there are no four-level factors
