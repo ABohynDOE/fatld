@@ -21,5 +21,5 @@
 ```{eval-rst}
 .. autoclass:: fatld.design.Design
     :members:
-.. autofunction:: fatld.design.from_array
+<!-- .. autofunction:: fatld.design.from_array -->
 ```

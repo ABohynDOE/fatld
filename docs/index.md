@@ -2,31 +2,16 @@
 
 ## Building regular four-and-two-level designs in python
 
-This package provides several tools to work with **four-and-two-level designs** (FATLD), more specifically, you can:
+This package provides several tools to work with **four-and-two-level designs** (FATLD).
+These designs only have factors with two level or four levele.
+They are also *regular*, meaning that the aliasing between the factors is either complete or null.
 
-- Generate designs using the {class}`fatld.design.Design` class
-- Characterize these designs using the methods documented in the [documentation](design-documentation).
-
-The {class}`fatld.design.Design` class and its methods are detailed in the following sections.
-
-```{eval-rst}
-.. toctree::
-   :caption: Design
-   :maxdepth: 2
-
-   design
-   wlp
-   tfi
-
-```
-
-Since this package focuses on *regular* designs, aliasing between the factors is an important focus too.
-You can explore aliasing relationships using *words* and *defining relations*, using several functions, presented in the following sections.
+To explore the relationships between factors in a design, you can use *words* and *defining relations*.
+These concepts are explained in the following sections, along with example using functions from of this package:
 
 ```{eval-rst}
 .. toctree::
-   :caption: Aliasing
-   :maxdepth: 2
+   :maxdepth: 1
 
    factors
    words
@@ -34,18 +19,30 @@ You can explore aliasing relationships using *words* and *defining relations*, u
 
 ```
 
+However, the core of this package is the {class}`fatld.design.Design` class that allows you to generate FATL designs, and characterize them using several criteria.
+The class and its related methods are detailed, using examples, in these following sections:
+
+```{eval-rst}
+.. toctree::
+   :maxdepth: 1
+
+   design
+   wlp
+   tfi
+
+```
+
 The complete module documentation is also available here.
 
 ```{eval-rst}
 .. toctree::
-   :caption: Module documentation
    :maxdepth: 2
 
    references
    documentation
 ```
 
-Along with {ref}`genindex`: a list of all the functions, classes and methods of the package.
+Along with {ref}`genindex` a list of all the functions, classes and methods of the package.
 
 (contact)=
 
