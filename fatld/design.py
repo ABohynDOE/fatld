@@ -12,7 +12,7 @@ from .relation import Relation, num2gen
 
 class Design:
     """
-    Regular design with four- and two-level factors.
+    Regular design with four-level and two-level factors.
 
     Parameters
     ----------
@@ -30,22 +30,28 @@ class Design:
         Number of runs
     m : int
         Number of four-level factors
-    cols: List[int]
-        List of the column numbers of all the two-level factors of the design.
+    n : int
+        Number of two-level factors in the design
     k : int
         Number of basic factors. Equals to the log2 of the runsize.
-    pf : List[List[int]]
-        List of the pseudo-factors triplets (as lists of integers), used to
-        define the four-level factors.
-    bf: List[int]
-        List of the column numbers of the basic factors not used
-        in the pseudo-factors `pf`.
     p : int
         Number of added factors
+
+    bf : List[int]
+        List of the column numbers of the basic factors not used in the pseudo-factors
+        `pf`.
+    pf : List[List[int]]
+        List of the pseudo-factors triplets (as lists of integers), used to define the
+        four-level factors.
     af : List[int]
         List of the column numbers of the added factors
-    n: int
-        Number of two-level factors in the design
+    cols : List[int]
+        List of the column numbers of all the two-level factors of the design.
+
+    array : np.ndarray
+        Design matrix of the design with the four-level factors first and then the
+        two-level factors. The two-level factors are ordered by column number and not
+        kept in the original order.
     """
 
     # TODO: refactor the docstring of the Design class

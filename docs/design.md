@@ -63,4 +63,28 @@ True
 
 ## Design matrix
 
-bla bla
+From a ``Design`` object you can also obtain the design matrix using the {attr}`fatld.design.Design.array` method.
+The design matrix is a $N \times (m+n)$ matrix, where $N$ is the runsize.
+The four-level factors are always the first columns of the matrix, then come the two-level factors ordered by column number.
+
+If you already have a design matrix as a numpy array, you can create a ``Design`` object with it using the {func}`fatld.design.from_array` function.
+The function will automatically determine the runsize, number of four-level factors and two-level columns.
+
+## Modifying a design
+
+There are three ways you can modify a ``Design`` object:
+
+- Adding a two-level factor: using the {meth}`fatld.design.Design.add_factor` method and providing the number of the factor.
+- Deleting a two-level factor: using the {meth}`fatld.design.Design.remove_factor` method and providing the number of the factor to remove. It cannot be a factor used as a pseudo-factor to generate a four-level factor.
+- *Flattening* the design, i.e., transforming the four-level factors back into its two two-level pseudofactors using the {meth}`fatld.design.Design.flatten` method.
+
+```{code-block} python
+>>> from fatld.design import Design
+>>> D = Design(runsize=64, m=2, cols=[5, 13, 17, 27])
+>>> D_minus = D.remove_factor(13)
+>>> D_minus.cols
+[5, 17, 27]
+>>> D_plus = D.add_factor(25)
+>>> D_plus.cols
+[5, 13, 17, 25, 27]
+```
