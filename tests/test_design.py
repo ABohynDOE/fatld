@@ -19,7 +19,7 @@ class TestDesignErrors:
 class TestDesignMethods:
     # Design 6 from Table 3 of Wu (1993)
     design = fatld.Design(runsize=32, m=1, cols=[29, 26, 22])
-    relation = fatld.relation.Relation(["bcef", "bdeg", "acdeh"], m=1)
+    relation = fatld.relation.Relation(["bcef", "bdeg", "acdeh"], m=1)  # type: ignore
 
     def test_twlp(self):
         twlp = self.design.twlp(max_length=5)
@@ -107,3 +107,10 @@ class TestClarity:
     def test_clear_error(self):
         with pytest.raises(ValueError):
             self.design.clear("4-2", "4-3")
+
+
+def test_from_array():
+    D = fatld.Design(32, 1, [17, 21, 29, 31])
+    mat = D.array
+    newD = fatld.design.from_array(mat)
+    assert D.cols == newD.cols
