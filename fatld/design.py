@@ -7,7 +7,7 @@ import oapackage as oa  # type: ignore
 import pandas as pd  # type: ignore
 
 from .main import basic_factor_matrix, custom_design, twlp
-from .relation import Relation, num2gen
+from .relation import Relation, num2gen, gen2num
 
 
 class Design:
@@ -373,12 +373,12 @@ class Design:
             for clear_type in ["4-4", "4-2", "2-2"]:
                 if interaction[clear_type]:
                     column_label = f"{clear_type} clear"
-                    clarity_df.loc[int_type, column_label] += 1
-                    clarity_df.loc["Any type", column_label] += 1
+                    clarity_df.loc[int_type, column_label] += 1  # type: ignore
+                    clarity_df.loc["Any type", column_label] += 1  # type: ignore
                     all_clear += 1
                 if all_clear == 3:
-                    clarity_df.loc[int_type, "Totally clear"] += 1
-                    clarity_df.loc["Any type", "Totally clear"] += 1
+                    clarity_df.loc[int_type, "Totally clear"] += 1  # type: ignore
+                    clarity_df.loc["Any type", "Totally clear"] += 1  # type: ignore
         return clarity_df
 
     def clear(self, interaction_type: str, clear_from: str) -> int:
@@ -496,3 +496,34 @@ class Design:
         new_cols = [i for i in self.af]
         new_cols.remove(number)
         return Design(self.runsize, self.m, new_cols)
+
+
+def from_array(mat: np.ndarray, zero_coded: bool = True):
+    # Define runsize
+    run_size, n_fac = mat.shape
+    # Define number of four-level factors
+    levels = [len(np.unique(mat[:, i])) for i in range(n_fac)]
+    n_flvl = sum([i == 4 for i in levels])
+    # Sort matrix and extract two-level part
+    sorting_list = [mat[:, i] for i in range(n_flvl)]
+    sorted_mat = mat[np.lexsort(sorting_list)]
+    tlvl_mat = sorted_mat[:, [i == 2 for i in levels]]
+    if not zero_coded:
+        tlvl_mat = (tlvl_mat + 1) / 2
+    # Compute all possible columns for that runsize
+    k = int(np.log2(run_size))
+    bf_matrix = basic_factor_matrix(k=k, zero_coding=True)
+    full_generator_matrix = np.zeros((k, 2**k - 1), dtype=int)
+    labels_list = []
+    for i in range(2**k - 1):
+        bin_string = f"{(i + 1):0{k}b}"[::-1]
+        full_generator_matrix[:, i] = [int(j) for j in bin_string]
+        gen = [chr(i + 97) for i, x in enumerate(bin_string) if int(x) == 1]
+        labels_list.append("".join(gen))
+    full_design_matrix = np.matmul(bf_matrix, full_generator_matrix) % 2
+    cols_mat = np.matmul(full_design_matrix.T * 2 - 1, tlvl_mat * 2 - 1)
+    cols_id, _ = np.nonzero(cols_mat)
+    cols_gen = [labels_list[i] for i in cols_id]
+    cols_num = [gen2num(i) for i in cols_gen]
+    added_cols = [i for i in cols_num if np.log2(i) % 1 != 0]
+    return Design(run_size, n_flvl, added_cols)
