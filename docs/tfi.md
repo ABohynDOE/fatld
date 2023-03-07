@@ -24,8 +24,8 @@ For simplicity, we define the *clairty* of an interaction as the different ways 
 
 The clarity of the interactions of a design is a good indicator of how good the design can accomodate TFI in a model.
 
-To vizualise this information easily, we use the {meth}`fatld.design.Design.clarity_matrix` method of a design.
+To vizualise this information easily, we use the {meth}`fatld.design.Design.clarity` method of a design.
 
 <!-- add example in code block-->
 
-And the individual numbers in a clarity_matrix can be obtained using the {meth}`fatld.design.Design.clear_from`.
+And the individual numbers in a clarity_matrix can be obtained using the {meth}`fatld.design.Design.clear`.
