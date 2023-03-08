@@ -67,8 +67,8 @@ From a ``Design`` object you can also obtain the design matrix using the {attr}`
 The design matrix is a $N \times (m+n)$ matrix, where $N$ is the runsize.
 The four-level factors are always the first columns of the matrix, then come the two-level factors ordered by column number.
 
-<!-- If you already have a design matrix as a numpy array, you can create a ``Design`` object with it using the {func}`fatld.design.from_array` function.
-The function will automatically determine the runsize, number of four-level factors and two-level columns. -->
+If you already have a design matrix as a numpy array, you can create a ``Design`` object with it using the {func}`fatld.design.from_array` function.
+The function will automatically determine the runsize, number of four-level factors and two-level columns.
 
 ## Modifying a design
 

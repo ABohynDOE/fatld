@@ -8,6 +8,8 @@ Let us consider the first added factor, represented by the letter $f$.
 If it is created using with generator $abcde$, then, the word representing that factor is $abcdef$.
 This word has length 6 and type 0 since it contains no pseudo-factors.
 
+(word-length)=
+
 ## Length
 
 The length of a word is the number of factors that composes it.
@@ -27,6 +29,8 @@ This function works for words containing both two-level factors and pseudo-facto
 ```{important}
 Do not forget to add the letter corresponding to the added factor at the end of the generator, else the length will be off be one !
 ```
+
+(word-type)=
 
 ## Type
 
