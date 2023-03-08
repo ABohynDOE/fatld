@@ -1,6 +1,4 @@
-# Welcome
-
-## Building regular four-and-two-level designs in python
+# Building regular four-and-two-level designs in python
 
 This package provides several tools to work with **four-and-two-level designs** (FATLD).
 These designs only have factors with two level or four levele.
