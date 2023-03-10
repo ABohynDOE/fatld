@@ -198,10 +198,18 @@ class Design:
         else:
             return wlp_list[0 : (max_length - 2)]
 
+    def resolution(self) -> Optional[int]:
+        """
+        Compute the resolution of the design.
+        """
+        wlp = self.wlp()
+        res = next((i + 3 for i, x in enumerate(wlp) if x), None)
+        return res
+
     def flatten(self, zero_coding: bool = True) -> np.ndarray:
         """
-        Flatten each four-level factor of the design into two independent two-level
-        factors.
+        Flatten each four-level factor of the design into three two-level
+        pseudo-factors.
 
         Parameters
         ----------
