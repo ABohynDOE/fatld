@@ -1,11 +1,11 @@
 # Building regular four-and-two-level designs in python
 
-This package provides several tools to work with **four-and-two-level designs** (FATLD).
-These designs only have factors with two level or four levele.
+This package provides several tools to work with **four-and-two-level** (FATL) designs.
+These designs only have factors with two or four levels.
 They are also *regular*, meaning that the aliasing between the factors is either complete or null.
 
 To explore the relationships between factors in a design, you can use *words* and *defining relations*.
-These concepts are explained in the following sections, along with example using functions from of this package:
+These concepts are explained in the following sections, along with examples using functions from this package:
 
 ```{eval-rst}
 .. toctree::
