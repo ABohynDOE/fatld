@@ -10,7 +10,7 @@ The column numbers, 27 and 30, correspond to the generators $abde$ and $bcde$, r
 After relabeling the pseudo-factors, the generators become $A_3de$ and $A_2cde$.
 Therefore, the defining relation of the design can be written as
 $$
-\{ A_3def, \; A_2cdeg \}
+(A_3def, \; A_2cdeg)
 $$
 
 In the ``fatld`` package, we can create the defining relation of the design using the {class}`fatld.relation.Relation` class that create a ``Relation`` object, which holds a defining relation.

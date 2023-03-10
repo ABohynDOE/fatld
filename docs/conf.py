@@ -64,7 +64,7 @@ html_favicon = "_static/favicon.png"
 html_theme = "furo"
 
 html_theme_options = {
-    "announcement": " 🚧 Website in progress 🚧 Any help is welcome !",
+    "announcement": " 🚧 Website in progress 🚧 Feel free to give a hand 🔨",
     "source_repository": "https://github.com/ABohynDOE/fatld/",
     "source_branch": "master",
     "source_directory": "docs/",

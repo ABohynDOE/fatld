@@ -44,3 +44,8 @@ poetry/core/*
 .ruff_cache/
 htmlcov/
 *.ipynb
+
+
+## Quarto rendering of fatld_presentation
+fatld_presentation_files/
+fatld_presentation.html
