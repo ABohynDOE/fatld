@@ -83,9 +83,25 @@ class TestClarity:
     )
     df = df.set_index(pd.Index(["4-4", "4-2", "2-2", "Any type"]))
 
+    design2 = fatld.Design(runsize=32, m=2, cols=[17, 21, 25, 29, 31])
+    df2 = pd.DataFrame(
+        {
+            "4-4 clear": [9, 36, 8, 53],
+            "4-2 clear": [9, 4, 15, 28],
+            "2-2 clear": [2, 36, 9, 47],
+            "Totally clear": [2, 4, 2, 8],
+        },
+        dtype=int,
+    )
+    df2 = df2.set_index(pd.Index(["4-4", "4-2", "2-2", "Any type"]))
+
     def test_clarity(self):
         tfi = self.design.clarity()
         assert tfi.equals(self.df)
+
+    def test_clarity_m2(self):
+        tfi = self.design2.clarity()
+        assert tfi.equals(self.df2)
 
     def test_clear(self):
         assertion_list = []
