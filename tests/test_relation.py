@@ -10,23 +10,26 @@ from fatld.relation import (
 )
 
 
-class TestNum2Gen:
-    def test_num2gen(self):
-        assert num2gen(7) == "abc"
+@pytest.mark.parametrize(
+    "num,mval,expected",
+    [
+        (7, None, "abc"),
+        (7, 1, "A3c"),
+        (13, 2, "A1B3"),
+    ],
+)  # type: ignore
+def test_num2gen(num, mval, expected):
+    assert num2gen(num, m=mval) == expected
 
-    def test_num2gen_mvalue1(self):
-        assert num2gen(7, m=1) == "A3c"
 
-    def test_num2gen_mvalue2(self):
-        assert num2gen(13, m=2) == "A1B3"
+def test_num2gen_typeerror():
+    with pytest.raises(TypeError):
+        num2gen("a")  # type: ignore
 
-    def test_num2gen_typeerror(self):
-        with pytest.raises(TypeError):
-            num2gen("a")  # type: ignore
 
-    def test_num2gen_valueerror(self):
-        with pytest.raises(ValueError):
-            num2gen(7, m=4)
+def test_num2gen_valueerror():
+    with pytest.raises(ValueError):
+        num2gen(7, m=4)
 
 
 def test_gen2num():
