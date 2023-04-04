@@ -10,9 +10,11 @@ from .main import basic_factor_matrix, custom_design, twlp
 from .relation import Relation, num2gen, gen2num
 
 # Setup the contrast matrix for the beta aberration
-contrast_matrix = np.array([[-3, 1, -1], [-1, -1, 3], [1, -1, -3], [3, 1, 1]])
-scaled_contrast_matrix = (
-    [2, 2, 2] * contrast_matrix / np.linalg.norm(contrast_matrix, axis=0)
+contrast_matrix = np.array(
+    [[-3.0, 1.0, -1.0], [-1.0, -1.0, 3.0], [1.0, -1.0, -3.0], [3.0, 1.0, 1.0]]
+)
+scaled_contrast_matrix = np.divide(
+    np.multiply(2.0, contrast_matrix), np.linalg.norm(contrast_matrix, axis=0)
 )
 
 
@@ -605,19 +607,19 @@ class Design:
 
 def from_array(mat: np.ndarray, zero_coded: bool = True) -> Design:
     """
-    Create a `Design`object from a matrix.
+    Create a Design object from a matrix.
 
     Parameters
     ----------
     mat : np.ndarray
         Design matrix
     zero_coded : bool, optional
-        The two-level factors in the design matrix are coded in 0/1, by default True
+        The two-level factors in the design matrix are coded in 0/1, by default True.
 
     Returns
     -------
     Design
-        A `Design` object with the factors detected in the matrix.
+        A Design object with the factors detected in the matrix.
     """
     # Define runsize
     run_size, n_fac = mat.shape
