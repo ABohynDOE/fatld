@@ -1,6 +1,6 @@
+from __future__ import annotations
 import warnings
-from itertools import chain, combinations
-from typing import Dict, List, Optional
+from itertools import chain, combinations, product, permutations
 
 import numpy as np
 import oapackage as oa  # type: ignore
@@ -8,6 +8,14 @@ import pandas as pd  # type: ignore
 
 from .main import basic_factor_matrix, custom_design, twlp
 from .relation import Relation, num2gen, gen2num
+
+# Setup the contrast matrix for the beta aberration
+contrast_matrix = np.array(
+    [[-3.0, 1.0, -1.0], [-1.0, -1.0, 3.0], [1.0, -1.0, -3.0], [3.0, 1.0, 1.0]]
+)
+scaled_contrast_matrix = np.divide(
+    np.multiply(2.0, contrast_matrix), np.linalg.norm(contrast_matrix, axis=0)
+)
 
 
 class Design:
@@ -55,7 +63,7 @@ class Design:
     """
 
     # TODO: refactor the docstring of the Design class
-    def __init__(self, runsize: int, m: int, cols: List[int]):
+    def __init__(self, runsize: int, m: int, cols: list[int]):
         # TODO: think about a `strict` keyword
         # it would bypass columns check and uses only the columns suplied
         # Run size value check
@@ -142,8 +150,8 @@ class Design:
         return f"Design(runsize={self.runsize}, m={self.m}, cols={self.af})"
 
     def twlp(
-        self, type_0: bool = True, max_length: Optional[int] = None
-    ) -> List[List[int]]:
+        self, type_0: bool = True, max_length: int | None = None
+    ) -> list[list[int]]:
         """Type-specific word length pattern
 
         Compute the type-specific word length pattern of a design, starting with words
@@ -169,7 +177,7 @@ class Design:
         ar = oa.array_link(self.array)
         return twlp(ar, type_0, max_length)
 
-    def wlp(self, max_length: Optional[int] = None) -> List[int]:
+    def wlp(self, max_length: int | None = None) -> list[int]:
         """Generalized word length pattern
 
         Compute the word length pattern, i.e., the number of words in the defining
@@ -198,7 +206,46 @@ class Design:
         else:
             return wlp_list[0 : (max_length - 2)]
 
-    def resolution(self) -> Optional[int]:
+    def qwlp(self, max_length: int | None = None) -> tuple[list[float], list[int]]:
+        """
+        Find the permutation of the levels of the m four-level factors that minimize
+        the qWLP for the design.
+
+        Returns
+        -------
+        best_wlp, permutations : tuple[list[float], list[int]]
+            Returns the minimal qWLP and the corresponding permutations of the
+            factor levels. The qWLP starts with words of length 3.
+        """
+        # Declare global variables
+        global scaled_contrast_matrix
+
+        # Compute the 12 permutations of the four levels
+        perms = []
+        for p in permutations(range(3)):
+            for i in range(4):
+                ordering = list(p)
+                ordering.insert(i, 3)
+                perms.append(ordering)
+        perms = perms[:12]
+
+        # Initialize list for best beta_vectors
+        best_perm = []
+        best_vector = []
+
+        # Compute the beta-vector for each permutation
+        for i, p in enumerate(product(range(12), repeat=self.m)):
+            perm_list = [perms[i] for i in p]
+            beta_vector = beta_wlp(
+                self,
+                permutation_list=perm_list,
+            )
+            if i == 0 or best_vector > beta_vector:
+                best_perm = perm_list
+                best_vector = beta_vector
+        return best_vector, best_perm
+
+    def resolution(self) -> int | None:
         """
         Compute the resolution of the design.
         """
@@ -236,7 +283,7 @@ class Design:
         else:
             return mat
 
-    def tfi_clearance(self) -> Dict[str, Dict[str, object]]:
+    def tfi_clearance(self) -> dict[str, dict[str, object]]:
         """
         Compute clarity of all two-factor interactions in the design.
 
@@ -271,7 +318,7 @@ class Design:
 
         """
         # LABELS
-        ### MAIN EFFECTS
+        # MAIN EFFECTS
 
         # 4lvl PF are labeled as uppercase + index i = 1,2,3
         label_list_4lvl_pf = [
@@ -280,7 +327,7 @@ class Design:
         # 2lvl factors labeled as lowercase
         label_list_2lvl = [chr(97 + i) for i in range(self.n)]
 
-        ### TWO-FACTOR-INTERACTIONS
+        # TWO-FACTOR-INTERACTIONS
 
         # Combinations of PF from the same four-level factors cannot be considered as
         # for any PF, p1 x p2 = p3 so combine BETWEEN the pseudo-factors triplets and
@@ -313,14 +360,14 @@ class Design:
         # Zero coding (0/1) is needed to perform multiplication of factors
         flat_array_coded = self.flatten(zero_coding=False)
 
-        ### MAIN EFFECTS
+        # MAIN EFFECTS
 
         two_level_fac_range = range(3 * self.m, (3 * self.m + self.n))
         matrix_2_me = flat_array_coded[:, two_level_fac_range]
         four_level_pf_range = range(3 * self.m)
         matrix_4_me = flat_array_coded[:, four_level_pf_range]
 
-        ### TWO-FACTOR INTERACTIONS
+        # TWO-FACTOR INTERACTIONS
 
         matrix_22_tfi = np.hstack(
             [
@@ -372,9 +419,10 @@ class Design:
         # tfi can be one of three types: 4-4, 4-2, or 2-2
         type_list_tfi = (
             ["4-4"] * len(label_list_44_tfi)
-            + ["4-2"] * len(label_list_42_tfi)
-            + ["2-2"] * len(label_list_22_tfi)
-            + ["clear"] * (len(label_list_2lvl) + 3 * len(label_list_4lvl_pf))
+            + ["4-2"] * len(label_list_42_tfi)  # noqa : W503
+            + ["2-2"] * len(label_list_22_tfi)  # noqa : W503
+            + ["clear"]  # noqa : W503
+            * (len(label_list_2lvl) + 3 * len(label_list_4lvl_pf))  # noqa : W503
         )
 
         # All alias-related variables are NA and will be filled later on
@@ -557,7 +605,22 @@ class Design:
         return Design(self.runsize, self.m, new_cols)
 
 
-def from_array(mat: np.ndarray, zero_coded: bool = True):
+def from_array(mat: np.ndarray, zero_coded: bool = True) -> Design:
+    """
+    Create a Design object from a matrix.
+
+    Parameters
+    ----------
+    mat : np.ndarray
+        Design matrix
+    zero_coded : bool, optional
+        The two-level factors in the design matrix are coded in 0/1, by default True.
+
+    Returns
+    -------
+    Design
+        A Design object with the factors detected in the matrix.
+    """
     # Define runsize
     run_size, n_fac = mat.shape
     # Define number of four-level factors
@@ -586,3 +649,168 @@ def from_array(mat: np.ndarray, zero_coded: bool = True):
     cols_num = [gen2num(i) for i in cols_gen]
     added_cols = [i for i in cols_num if np.log2(i) % 1 != 0]
     return Design(run_size, n_flvl, added_cols)
+
+
+def beta_wlp(
+    design: Design,
+    permutation_list: list[list[int]],
+    max_length: None | int = None,
+) -> list[float]:
+    """
+    Compute the beta WLP of the design.
+
+    Parameters
+    ----------
+    design : fatld.Design
+        Four-and-two-level design
+    permutation_list : list[list[int]]
+        List of sublists, where each sublist corresponds to the ordering of the levels
+        a four-level factor (of the form [0,1,2,3]).
+    max_length : None | int, optional
+        Maximum length of words considered in the beta WLP, by default None so that all
+        the word lengths are considered.
+
+    Returns
+    -------
+    beta_wlp : list[float]
+        Vector of the Aq values starting with words of length 3.
+    """
+    # Declare global variables
+    global scaled_contrast_matrix
+
+    design_matrix = design.array
+    m = design.m
+    n = design.n
+    N = design.runsize
+
+    # Permutations have to contain only 0,1,2,3
+    if any([len(i) != 4 for i in permutation_list]):
+        raise ValueError("Each permutation must contain four elements")
+
+    if any([i not in [0, 1, 2, 3] for p in permutation_list for i in p]):
+        raise ValueError("Permutations can only contain 0, 1, 2, or 3")
+    # There must be one permutation per four-level factor
+    if len(permutation_list) != design.m:
+        raise ValueError(
+            "There must be one permutation per four-level factor, only %i given"
+            % len(permutation_list)
+        )
+
+    # Isolate four-level and two-level part of the design
+    fl_matrix = design_matrix[:, :m]
+    tl_matrix = 2 * design_matrix[:, m:] - 1
+
+    # Build all interactions between all two-level factors
+    tl_interaction_list = []
+    tl_interaction_length = []
+    for i in range(n):
+        for c in combinations(range(n), i + 1):
+            single_interaction_vector = np.prod(tl_matrix[:, c], axis=1)[
+                :, None
+            ]  # noqa: E201
+            tl_interaction_list.append(single_interaction_vector)
+            tl_interaction_length.append(i + 1)
+    tl_interaction_matrix = np.hstack(
+        tl_interaction_list
+    )  # Matrix of all ME and 2- to n-factor interactions
+
+    # Unfold the four-level factors into L, Q, C matrices
+    fl_contrast_list = []
+    for x in range(m):
+        permutation = permutation_list[x]
+        mix_contrast_matrix = scaled_contrast_matrix[permutation, :]
+        single_fl_contrast_matrix = np.zeros((N, 3))
+        for i in range(4):
+            single_fl_contrast_matrix[
+                fl_matrix[:, x] == i, :
+            ] = mix_contrast_matrix[  # noqa: E201
+                i, :
+            ]
+        fl_contrast_list.append(single_fl_contrast_matrix)
+    fl_contrast_matrix = np.hstack(fl_contrast_list)
+
+    # Initialize the length and type vectors
+    fl_contrast_type = [1 for _ in range(3 * m)]
+    fl_contrast_length = [i + 1 for _ in range(m) for i in range(3)]
+
+    # No interaction can be created
+    if m == 1:
+        fl_full_contrast_matrix = fl_contrast_matrix
+    # Main effects for the two four-level factors and the 3^2 interactions between the
+    # 6 terms.
+    elif m == 2:
+        fl_contrast_interaction_list = []
+        for p in product(range(3), repeat=2):
+            new_p = [x + (3 * i) for i, x in enumerate(p)]
+            single_fl_contrast_interaction_vector = np.prod(
+                fl_contrast_matrix[:, new_p], axis=1
+            )[:, None]
+            fl_contrast_interaction_list.append(single_fl_contrast_interaction_vector)
+            fl_contrast_length.append(sum(p) + 2)
+            fl_contrast_type.append(2)
+        fl_contrast_interaction_matrix = np.hstack(fl_contrast_interaction_list)
+        fl_full_contrast_matrix = np.concatenate(
+            (fl_contrast_matrix, fl_contrast_interaction_matrix), axis=1
+        )
+    # Three different terms:
+    # - Main effects for the 3 four-level factors (3*3=9 terms)
+    # - Interactions between 2 of the 3 four-level factors (3 ways of creating 9 terms)
+    # - Interactions between the 3 four-level factors (27 terms)
+    elif m == 3:
+        # Interactions between 2 of the 3 four-level factors
+        fl_contrast_interaction_list = []
+        for c in combinations(range(3), 2):
+            for p in product(range(3), repeat=2):
+                new_p = [3 * c[i] + x for i, x in enumerate(p)]
+                single_fl_contrast_interaction_vector = np.prod(
+                    fl_contrast_matrix[:, new_p], axis=1
+                )[:, None]
+                fl_contrast_interaction_list.append(
+                    single_fl_contrast_interaction_vector
+                )
+                fl_contrast_length.append(sum(p) + 2)
+                fl_contrast_type.append(2)
+
+        # Interactions between 3 four-level factors
+        for p in product(range(3), repeat=3):
+            # p is a tuple with two numbers corresponding with the polynomial contrasts
+            # chosen for the product
+            new_p = [3 * i + x for i, x in enumerate(p)]
+            single_fl_contrast_interaction_vector = np.prod(
+                fl_contrast_matrix[:, new_p], axis=1
+            )[:, None]
+            fl_contrast_interaction_list.append(single_fl_contrast_interaction_vector)
+            fl_contrast_length.append(sum(p) + 3)
+            fl_contrast_type.append(3)
+        fl_contrast_interaction_matrix = np.hstack(fl_contrast_interaction_list)
+        fl_full_contrast_matrix = np.concatenate(
+            (fl_contrast_matrix, fl_contrast_interaction_matrix), axis=1
+        )
+    else:
+        raise ValueError("Unknown m value")
+
+    # Build word length vector
+    word_length = (
+        np.array(fl_contrast_length)[:, None].T
+        + np.array(tl_interaction_length)[:, None]  # noqa: W503
+    )
+
+    # # Build word type vector
+    # word_type = (
+    #     np.array(fl_contrast_type)[:, None].T
+    #     + np.array(tl_interaction_length)[:, None]  # noqa: W503
+    # )
+
+    # Compute squared correlations
+    correlation = (tl_interaction_matrix.T @ fl_full_contrast_matrix) / N
+    correlation_sq = np.round(correlation**2, 2)
+
+    # Compute Beta values
+    if max_length is None:
+        max_length = int(np.amax(word_length)) + 1
+    # correlation_sq[word_type == 2] = 0
+    a_vector = []
+    for length in range(3, max_length):
+        a_value = np.round(np.sum(correlation_sq[word_length == length]), 2)
+        a_vector.append(a_value)
+    return a_vector

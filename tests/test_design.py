@@ -7,6 +7,7 @@ Author: Alexandre Bohyn
 import numpy as np
 import pandas as pd  # type: ignore
 import pytest  # type: ignore
+import itertools
 
 import fatld
 
@@ -130,3 +131,36 @@ def test_from_array():
     mat = D.array
     newD = fatld.design.from_array(mat)
     assert D.cols == newD.cols
+
+
+def test_beta_aberration():
+    D = fatld.Design(32, 1, [12, 20, 24, 29])
+
+    # Compute the 12 permutations of the four levels
+    perms = []
+    for p in itertools.permutations(range(3)):
+        for i in range(4):
+            ordering = list(p)
+            ordering.insert(i, 3)
+            perms.append(ordering)
+    perms = perms[:12]
+
+    # Compute the unique qWLP
+    unique_qwlp = []
+
+    for i, p in enumerate(itertools.product(range(12), repeat=D.m)):
+        perm_list = [perms[i] for i in p]
+        beta_vector = fatld.design.beta_wlp(
+            D,
+            permutation_list=perm_list,
+        )
+        if beta_vector not in unique_qwlp:
+            unique_qwlp.append(beta_vector)
+
+    final_list = [
+        [0.0, 0.0, 3.0, 4.0, 0.0, 0.0, 1.0, 0.0],
+        [0.0, 2.4, 3.2, 0.6, 0.8, 0.8, 0.0, 0.2],
+        [0.0, 0.6, 0.8, 2.4, 3.2, 0.2, 0.0, 0.8],
+    ]
+
+    assert unique_qwlp == final_list
