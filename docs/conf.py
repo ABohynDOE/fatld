@@ -12,7 +12,8 @@
 
 import os
 import sys
-import pkg_resources
+
+# import pkg_resources
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -23,8 +24,8 @@ copyright = "2023, Alexandre Bohyn"
 author = "Alexandre Bohyn"
 
 # The full version, including alpha/beta/rc tags
-release = pkg_resources.get_distribution("fatld").version
-# release = "0.1.2"
+# release = pkg_resources.get_distribution("fatld").version
+release = "0.1.3"
 
 # -- General configuration ---------------------------------------------------
 
