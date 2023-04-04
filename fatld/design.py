@@ -1,6 +1,6 @@
+from __future__ import annotations
 import warnings
 from itertools import chain, combinations
-from typing import Dict, List, Optional
 
 import numpy as np
 import oapackage as oa  # type: ignore
@@ -8,6 +8,12 @@ import pandas as pd  # type: ignore
 
 from .main import basic_factor_matrix, custom_design, twlp
 from .relation import Relation, num2gen, gen2num
+
+# Setup the contrast matrix for the beta aberration
+contrast_matrix = np.array([[-3, 1, -1], [-1, -1, 3], [1, -1, -3], [3, 1, 1]])
+scaled_contrast_matrix = (
+    [2, 2, 2] * contrast_matrix / np.linalg.norm(contrast_matrix, axis=0)
+)
 
 
 class Design:
@@ -55,7 +61,7 @@ class Design:
     """
 
     # TODO: refactor the docstring of the Design class
-    def __init__(self, runsize: int, m: int, cols: List[int]):
+    def __init__(self, runsize: int, m: int, cols: list[int]):
         # TODO: think about a `strict` keyword
         # it would bypass columns check and uses only the columns suplied
         # Run size value check
@@ -142,8 +148,8 @@ class Design:
         return f"Design(runsize={self.runsize}, m={self.m}, cols={self.af})"
 
     def twlp(
-        self, type_0: bool = True, max_length: Optional[int] = None
-    ) -> List[List[int]]:
+        self, type_0: bool = True, max_length: int | None = None
+    ) -> list[list[int]]:
         """Type-specific word length pattern
 
         Compute the type-specific word length pattern of a design, starting with words
@@ -169,7 +175,7 @@ class Design:
         ar = oa.array_link(self.array)
         return twlp(ar, type_0, max_length)
 
-    def wlp(self, max_length: Optional[int] = None) -> List[int]:
+    def wlp(self, max_length: int | None = None) -> list[int]:
         """Generalized word length pattern
 
         Compute the word length pattern, i.e., the number of words in the defining
@@ -198,7 +204,7 @@ class Design:
         else:
             return wlp_list[0 : (max_length - 2)]
 
-    def resolution(self) -> Optional[int]:
+    def resolution(self) -> int | None:
         """
         Compute the resolution of the design.
         """
@@ -236,7 +242,7 @@ class Design:
         else:
             return mat
 
-    def tfi_clearance(self) -> Dict[str, Dict[str, object]]:
+    def tfi_clearance(self) -> dict[str, dict[str, object]]:
         """
         Compute clarity of all two-factor interactions in the design.
 
@@ -271,7 +277,7 @@ class Design:
 
         """
         # LABELS
-        ### MAIN EFFECTS
+        # MAIN EFFECTS
 
         # 4lvl PF are labeled as uppercase + index i = 1,2,3
         label_list_4lvl_pf = [
@@ -280,7 +286,7 @@ class Design:
         # 2lvl factors labeled as lowercase
         label_list_2lvl = [chr(97 + i) for i in range(self.n)]
 
-        ### TWO-FACTOR-INTERACTIONS
+        # TWO-FACTOR-INTERACTIONS
 
         # Combinations of PF from the same four-level factors cannot be considered as
         # for any PF, p1 x p2 = p3 so combine BETWEEN the pseudo-factors triplets and
@@ -313,14 +319,14 @@ class Design:
         # Zero coding (0/1) is needed to perform multiplication of factors
         flat_array_coded = self.flatten(zero_coding=False)
 
-        ### MAIN EFFECTS
+        # MAIN EFFECTS
 
         two_level_fac_range = range(3 * self.m, (3 * self.m + self.n))
         matrix_2_me = flat_array_coded[:, two_level_fac_range]
         four_level_pf_range = range(3 * self.m)
         matrix_4_me = flat_array_coded[:, four_level_pf_range]
 
-        ### TWO-FACTOR INTERACTIONS
+        # TWO-FACTOR INTERACTIONS
 
         matrix_22_tfi = np.hstack(
             [
@@ -372,9 +378,10 @@ class Design:
         # tfi can be one of three types: 4-4, 4-2, or 2-2
         type_list_tfi = (
             ["4-4"] * len(label_list_44_tfi)
-            + ["4-2"] * len(label_list_42_tfi)
-            + ["2-2"] * len(label_list_22_tfi)
-            + ["clear"] * (len(label_list_2lvl) + 3 * len(label_list_4lvl_pf))
+            + ["4-2"] * len(label_list_42_tfi)  # noqa : W503
+            + ["2-2"] * len(label_list_22_tfi)  # noqa : W503
+            + ["clear"]  # noqa : W503
+            * (len(label_list_2lvl) + 3 * len(label_list_4lvl_pf))  # noqa : W503
         )
 
         # All alias-related variables are NA and will be filled later on
