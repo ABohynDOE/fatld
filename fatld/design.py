@@ -1,6 +1,6 @@
 from __future__ import annotations
 import warnings
-from itertools import chain, combinations, product
+from itertools import chain, combinations, product, permutations
 
 import numpy as np
 import oapackage as oa  # type: ignore
@@ -203,6 +203,45 @@ class Design:
             return wlp_list
         else:
             return wlp_list[0 : (max_length - 2)]
+
+    def qwlp(self, max_length: int | None = None) -> tuple[list[float], list[int]]:
+        """
+        Find the permutation of the levels of the m four-level factors that minimize
+        the qWLP for the design.
+
+        Returns
+        -------
+        best_wlp, permutations : tuple[list[float], list[int]]
+            Returns the minimal qWLP and the corresponding permutations of the
+            factor levels. The qWLP starts with words of length 3.
+        """
+        # Declare global variables
+        global scaled_contrast_matrix
+
+        # Compute the 12 permutations of the four levels
+        perms = []
+        for p in permutations(range(3)):
+            for i in range(4):
+                ordering = list(p)
+                ordering.insert(i, 3)
+                perms.append(ordering)
+        perms = perms[:12]
+
+        # Initialize list for best beta_vectors
+        best_perm = []
+        best_vector = []
+
+        # Compute the beta-vector for each permutation
+        for i, p in enumerate(product(range(12), repeat=self.m)):
+            perm_list = [perms[i] for i in p]
+            beta_vector = beta_wlp(
+                self,
+                permutation_list=perm_list,
+            )
+            if i == 0 or best_vector > beta_vector:
+                best_perm = perm_list
+                best_vector = beta_vector
+        return best_vector, best_perm
 
     def resolution(self) -> int | None:
         """
