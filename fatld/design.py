@@ -211,6 +211,13 @@ class Design:
         Find the permutation of the levels of the m four-level factors that minimize
         the qWLP for the design.
 
+        Parameters
+        ----------
+        max_length : int, optional
+            Max word length to consider in the qWLP, by default None,
+            all the word lengths are computed (careful as it is computationally
+            intensive for large values of n).
+
         Returns
         -------
         best_wlp, permutations : tuple[list[float], list[int]]
@@ -237,8 +244,7 @@ class Design:
         for i, p in enumerate(product(range(12), repeat=self.m)):
             perm_list = [perms[i] for i in p]
             beta_vector = beta_wlp(
-                self,
-                permutation_list=perm_list,
+                self, permutation_list=perm_list, max_length=max_length
             )
             if i == 0 or best_vector > beta_vector:
                 best_perm = perm_list
@@ -703,7 +709,11 @@ def beta_wlp(
     # Build all interactions between all two-level factors
     tl_interaction_list = []
     tl_interaction_length = []
-    for i in range(n):
+    if max_length is None:
+        max_n_value = n
+    else:
+        max_n_value = max_length - 1
+    for i in range(max_n_value):
         for c in combinations(range(n), i + 1):
             single_interaction_vector = np.prod(tl_matrix[:, c], axis=1)[
                 :, None
@@ -807,10 +817,12 @@ def beta_wlp(
 
     # Compute Beta values
     if max_length is None:
-        max_length = int(np.amax(word_length)) + 1
+        max_Aq_length = int(np.amax(word_length)) + 1
+    else:
+        max_Aq_length = max_length + 1
     # correlation_sq[word_type == 2] = 0
     a_vector = []
-    for length in range(3, max_length):
+    for length in range(3, max_Aq_length):
         a_value = np.round(np.sum(correlation_sq[word_length == length]), 2)
         a_vector.append(a_value)
     return a_vector
