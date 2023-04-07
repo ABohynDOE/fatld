@@ -9,6 +9,8 @@ import pandas as pd  # type: ignore
 import pytest  # type: ignore
 import itertools
 
+from collections import Counter
+
 import fatld
 
 
@@ -164,3 +166,27 @@ def test_beta_aberration():
     ]
 
     assert unique_qwlp == final_list
+
+
+def test_qwlp():
+    D = fatld.Design(32, 2, [17, 18, 20, 24, 19, 28, 5, 9, 6, 10, 7, 11, 13])
+    vec, perm = D.qwlp(max_length=5)
+    assert vec == [8.0, 37.0, 107.0]
+
+
+def test_beta_aberration_low_n():
+    D = fatld.Design(32, 2, [31])  # Here n = 2 which is lower than the max_length set
+    qvec, perm = D.qwlp(max_length=6)
+    assert qvec == [0.0, 0.0, 0.0, 1.0]
+
+
+def test_number_interactions():
+    assert fatld.design.nbr_interactions(7, 5) == 119
+
+
+def test_tfi_model_matrix():
+    tfi_model_matrix = fatld.design.build_tfi_model_matrix(n=7, max_length=5)
+    int_length = np.sum(tfi_model_matrix, axis=0).tolist()
+    c = Counter(int_length)
+    d = dict(c)
+    assert d == {1: 7, 2: 21, 3: 35, 4: 35, 5: 21}

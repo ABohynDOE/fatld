@@ -1,6 +1,7 @@
 from __future__ import annotations
 import warnings
 from itertools import chain, combinations, product, permutations
+from math import comb
 
 import numpy as np
 import oapackage as oa  # type: ignore
@@ -704,25 +705,17 @@ def beta_wlp(
 
     # Isolate four-level and two-level part of the design
     fl_matrix = design_matrix[:, :m]
-    tl_matrix = 2 * design_matrix[:, m:] - 1
+    tl_matrix = design_matrix[:, m:]
 
     # Build all interactions between all two-level factors
-    tl_interaction_list = []
-    tl_interaction_length = []
     if max_length is None:
         max_n_value = n
     else:
         max_n_value = max_length - 1
-    for i in range(max_n_value):
-        for c in combinations(range(n), i + 1):
-            single_interaction_vector = np.prod(tl_matrix[:, c], axis=1)[
-                :, None
-            ]  # noqa: E201
-            tl_interaction_list.append(single_interaction_vector)
-            tl_interaction_length.append(i + 1)
-    tl_interaction_matrix = np.hstack(
-        tl_interaction_list
-    )  # Matrix of all ME and 2- to n-factor interactions
+    tfi_model_matrix = build_tfi_model_matrix(n=n, max_length=max_n_value)
+    tl_interaction_matrix = np.matmul(tl_matrix, tfi_model_matrix) % 2
+    tl_interaction_matrix = (2 * tl_interaction_matrix) - 1
+    tl_interaction_length = np.sum(tfi_model_matrix, axis=0).tolist()
 
     # Unfold the four-level factors into L, Q, C matrices
     fl_contrast_list = []
@@ -740,7 +733,6 @@ def beta_wlp(
     fl_contrast_matrix = np.hstack(fl_contrast_list)
 
     # Initialize the length and type vectors
-    fl_contrast_type = [1 for _ in range(3 * m)]
     fl_contrast_length = [i + 1 for _ in range(m) for i in range(3)]
 
     # No interaction can be created
@@ -757,7 +749,6 @@ def beta_wlp(
             )[:, None]
             fl_contrast_interaction_list.append(single_fl_contrast_interaction_vector)
             fl_contrast_length.append(sum(p) + 2)
-            fl_contrast_type.append(2)
         fl_contrast_interaction_matrix = np.hstack(fl_contrast_interaction_list)
         fl_full_contrast_matrix = np.concatenate(
             (fl_contrast_matrix, fl_contrast_interaction_matrix), axis=1
@@ -779,7 +770,6 @@ def beta_wlp(
                     single_fl_contrast_interaction_vector
                 )
                 fl_contrast_length.append(sum(p) + 2)
-                fl_contrast_type.append(2)
 
         # Interactions between 3 four-level factors
         for p in product(range(3), repeat=3):
@@ -791,7 +781,6 @@ def beta_wlp(
             )[:, None]
             fl_contrast_interaction_list.append(single_fl_contrast_interaction_vector)
             fl_contrast_length.append(sum(p) + 3)
-            fl_contrast_type.append(3)
         fl_contrast_interaction_matrix = np.hstack(fl_contrast_interaction_list)
         fl_full_contrast_matrix = np.concatenate(
             (fl_contrast_matrix, fl_contrast_interaction_matrix), axis=1
@@ -805,12 +794,6 @@ def beta_wlp(
         + np.array(tl_interaction_length)[:, None]  # noqa: W503
     )
 
-    # # Build word type vector
-    # word_type = (
-    #     np.array(fl_contrast_type)[:, None].T
-    #     + np.array(tl_interaction_length)[:, None]  # noqa: W503
-    # )
-
     # Compute squared correlations
     correlation = (tl_interaction_matrix.T @ fl_full_contrast_matrix) / N
     correlation_sq = np.round(correlation**2, 2)
@@ -820,9 +803,50 @@ def beta_wlp(
         max_Aq_length = int(np.amax(word_length)) + 1
     else:
         max_Aq_length = max_length + 1
-    # correlation_sq[word_type == 2] = 0
     a_vector = []
     for length in range(3, max_Aq_length):
         a_value = np.round(np.sum(correlation_sq[word_length == length]), 2)
         a_vector.append(a_value)
     return a_vector
+
+
+def nbr_interactions(n: int, max_length: int) -> int:
+    """
+    Compute the total number of interactions between i factors among n, where i
+    ranges between 1 and max_length.
+    """
+    val = 0
+    for i in range(max_length):
+        val += comb(n, (i + 1))
+    return val
+
+
+def build_tfi_model_matrix(n: int, max_length: int) -> np.ndarray:
+    """
+    Build the model matrix to compute all interactions between i factors among n
+    with i ranging from 1 to n.
+    In this model matrix, a 1 represents an active factor in the interaction, while
+    a 0 zero represents an inactive factor.
+
+    Parameters
+    ----------
+    n : int
+        Number of two-level factors
+    max_length : int
+        Maximum number of factors to consider in the interactions.
+        For example, for a two-factor interaction, max_length should be equal to 2.
+
+    Returns
+    -------
+    np.ndarray
+        Model matrix of size n-by-s, where s is the total number of interactions.
+    """
+    # Initialize matrix
+    tfi_model_matrix = np.zeros((n, nbr_interactions(n, max_length)), dtype=int)
+    # Ones represent an active factor in the interaction
+    index = 0
+    for i in range(max_length):
+        for c in combinations(range(n), i + 1):
+            tfi_model_matrix[c, index] = 1
+            index += 1
+    return tfi_model_matrix
