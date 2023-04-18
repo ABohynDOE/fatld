@@ -135,7 +135,7 @@ def test_from_array():
     assert D.cols == newD.cols
 
 
-def test_beta_aberration():
+def test_beta_aberration_m1():
     D = fatld.Design(32, 1, [12, 20, 24, 29])
 
     # Compute the 12 permutations of the four levels
@@ -147,15 +147,14 @@ def test_beta_aberration():
             perms.append(ordering)
     perms = perms[:12]
 
-    # Compute the unique qWLP
-    unique_qwlp = []
+    # Compute all the beta WLP
+    a_vector_list = fatld.design.beta_wlp(
+        design=D, permutation_list=[[i] for i in perms]
+    )
 
-    for i, p in enumerate(itertools.product(range(12), repeat=D.m)):
-        perm_list = [perms[i] for i in p]
-        beta_vector = fatld.design.beta_wlp(
-            D,
-            permutation_list=perm_list,
-        )
+    # Select only the unique qWLP
+    unique_qwlp = []
+    for i, beta_vector in enumerate(a_vector_list):
         if beta_vector not in unique_qwlp:
             unique_qwlp.append(beta_vector)
 
