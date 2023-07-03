@@ -4,13 +4,8 @@ import numpy as np
 import oapackage as oa  # type: ignore
 import pytest  # type: ignore
 
-import fatld
 from fatld import Design
 from fatld.main import basic_factor_matrix, power2_decomposition, twlp
-
-
-def test_version():
-    assert fatld.__version__ == "0.1.0"
 
 
 class TestBasicFactorMatrix:
