@@ -19,8 +19,8 @@ The package can be used from Python:
 [1, 3, 3, 0, 0]
 >>> D.defining_relation()
 ['A1cef', 'A3deg', 'A1cdeh']
->>> print("There are %s 2-2 interactions totally clear from any main effect or other interaction." % D.clear('2-2', 'all'))
-There are 6 2-2 interactions totally clear from any main effect or other interaction.
+>>> print("There are %s 2-2 interactions clear from any main effect or other two-factor interaction." % D.clear('2-2'))
+There are 6 2-2 interactions clear from any main effect or other two-factor interaction.
 >>> print("The design contains %s four-level factors and %s two-level factors" % (D.m, D.n))
 The design contains 1 four-level factors and 6 two-level factors
 ```

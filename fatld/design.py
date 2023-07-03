@@ -207,7 +207,7 @@ class Design:
         else:
             return wlp_list[0 : (max_length - 2)]
 
-    def qwlp(self, max_length: int | None = None) -> tuple[list[float], list[int]]:
+    def beta_wlp(self, max_length: int | None = None) -> tuple[list[float], list[int]]:
         """
         Find the permutation of the levels of the m four-level factors that minimize
         the qWLP for the design.
@@ -243,7 +243,7 @@ class Design:
             all_perms.append([perms[i] for i in p])
 
         # Compute beta wlp for all permutations
-        a_vector_list = beta_wlp(
+        a_vector_list = qwlp(
             design=self, permutation_list=all_perms, max_length=max_length
         )
 
@@ -257,6 +257,49 @@ class Design:
                 best_perm = all_perms[i]
 
         return best_vector, best_perm
+
+    def w2_wlp(self) -> tuple[list[float], str]:
+        design_oa = oa.array_link(self.array)
+        design_wlp = list(map(int, design_oa.GWLP()))
+
+        best_factor = "A"
+        best_w2_vector = []
+        for factor_index in range(self.m):
+            # Remove the blocking factor and evaluate the WLP of the design
+            trmt_wlp = list(map(int, design_oa.deleteColumn(factor_index).GWLP()))
+            block_wlp = [design_wlp[i] - x for i, x in enumerate(trmt_wlp)]
+            w2_vector = build_w2_vector(block_wlp, trmt_wlp)
+            # Set as default if it is the first factor we evaluate
+            if factor_index == 0:
+                best_w2_vector = w2_vector
+            else:
+                if w2_vector < best_w2_vector:
+                    best_w2_vector = w2_vector
+                    best_factor = chr(65 + factor_index)
+        return best_w2_vector, best_factor
+
+    def alpha_wlp(self, rounding: bool = True) -> list[float]:
+        twlp = self.twlp(max_length=4)
+        a3_vector = twlp[0] + [0] * (3 - len(twlp[0]))  # Right pad with 0
+        a4_vector = twlp[1] + [0] * (4 - len(twlp[1]))
+        omega_weights = {
+            "w2": [3 / 3, 2 / 3, 1 / 3],
+            "w4": [0 / 3, 1 / 3, 2 / 3],
+            "w22": [6 / 6, 3 / 6, 1 / 6, 0 / 6],
+            "w42": [0 / 6, 3 / 6, 4 / 6, 3 / 6],
+            "w44": [0 / 6, 0 / 6, 1 / 6, 3 / 6],
+        }
+        omega_values = dict()
+        for name, weight_vector in omega_weights.items():
+            if len(name) == 2:
+                value = [w * a for w, a in zip(weight_vector, a3_vector)]
+            else:
+                value = [w * a for w, a in zip(weight_vector, a4_vector)]
+            omega_values[name] = sum(value)
+        alpha_wlp = [omega_values[i] for i in ["w4", "w2", "w42", "w22", "w44"]]
+        if rounding:
+            alpha_wlp = [round(i, 3) for i in alpha_wlp]
+        return alpha_wlp
 
     def resolution(self) -> int | None:
         """
@@ -501,7 +544,7 @@ class Design:
                     clarity_df.loc["Any type", "Totally clear"] += 1  # type: ignore
         return clarity_df
 
-    def clear(self, interaction_type: str, clear_from: str) -> int:
+    def clear(self, interaction_type: str, clear_from: str = "all") -> int:
         """
         Compute the number of interactions of type `interaction_type` that are clear
         from interactions of the `clear_from` type.
@@ -664,7 +707,7 @@ def from_array(mat: np.ndarray, zero_coded: bool = True) -> Design:
     return Design(run_size, n_flvl, added_cols)
 
 
-def beta_wlp(
+def qwlp(
     design: Design,
     permutation_list: list[list[list[int]]],
     max_length: None | int = None,
@@ -865,3 +908,22 @@ def build_tfi_model_matrix(n: int, max_length: int) -> np.ndarray:
             tfi_model_matrix[c, index] = 1
             index += 1
     return tfi_model_matrix
+
+
+def build_w2_vector(blocking_wlp: list[int], treatment_wlp: list[int]) -> list[int]:
+    """
+    Compute the W_2 word length pattern (WLP) of a design, given its treatment WLP and
+    blocking WLP.
+    Both WLP must start with words of length 0 (so that list indices matches word
+    lengths).
+    """
+    if len(blocking_wlp) != len(treatment_wlp):
+        raise ValueError("Both WLP must have the same length")
+    w2_vector = [treatment_wlp[3], blocking_wlp[3]]
+    n_words = len(blocking_wlp) - 1
+    max_i = 1 + (n_words - 1) // 2
+    for i in range(2, max_i):
+        w2_vector.append(treatment_wlp[2 * i])
+        w2_vector.append(treatment_wlp[2 * i + 1])
+        w2_vector.append(blocking_wlp[i + 2])
+    return w2_vector
