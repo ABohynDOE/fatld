@@ -259,6 +259,20 @@ class Design:
         return best_vector, best_perm
 
     def w2_wlp(self) -> tuple[list[float], str]:
+        """
+        Compute the W_2 word length pattern of the design.
+        The structure of the W_2 vector is:
+        A3.0, A2.1, A4.0, A5.0, A3.1, A6.0, A7.0, ...
+
+        Returns
+        -------
+        W2_vector: list[float]
+            The vector containing the A_x.i values of the W_2 word length pattern
+        factor: str
+            A string indicating which factor must be used to obtain W_2 optimal
+            blocking. Can either be 'A', 'B', or 'C'.
+
+        """
         design_oa = oa.array_link(self.array)
         design_wlp = list(map(int, design_oa.GWLP()))
 
@@ -279,6 +293,21 @@ class Design:
         return best_w2_vector, best_factor
 
     def alpha_wlp(self, rounding: bool = True) -> list[float]:
+        """
+        Compute the alpha word length pattern of the design.
+        The alpha wlp contains 5 values ordered in the following way:
+        ω4, ω2, ω42, ω22, ω44
+
+        Parameters
+        ----------
+        rounding : bool, optional
+            Round the ω values to 2 decimals, by default True
+
+        Returns
+        -------
+        list[float]
+            The alpha word length pattern
+        """
         twlp = self.twlp(max_length=4)
         a3_vector = twlp[0] + [0] * (3 - len(twlp[0]))  # Right pad with 0
         a4_vector = twlp[1] + [0] * (4 - len(twlp[1]))

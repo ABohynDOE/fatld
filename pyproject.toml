@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fatld"
-version = "0.1.6"
+version = "0.1.7"
 description = "Generate and characterize designs with four-and-two-level (FATL) factors"
 authors = ["Alexandre Bohyn <alexandre.bohyn@kuleuven.be>"]
 readme = "README.md"
