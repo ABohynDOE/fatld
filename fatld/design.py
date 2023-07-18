@@ -138,7 +138,7 @@ class Design:
         for i in range(self.m):
             idx = [2 * i, ((2 * i) + 1)]
             coeff_matrix_4lvl[idx, i] = [2, 1]
-        four_lvl_part = bf_matrix[:, 0 : (2 * self.m)] @ coeff_matrix_4lvl
+        four_lvl_part = bf_matrix[:, 0 : (2 * self.m)] @ coeff_matrix_4lvl  # noqa: E203
         # 2-level part
         two_lvl_part = custom_design(self.runsize, self.cols)
         # Assemble into one matrix
@@ -205,9 +205,11 @@ class Design:
         elif max_length is None:
             return wlp_list
         else:
-            return wlp_list[0 : (max_length - 2)]
+            return wlp_list[0 : (max_length - 2)]  # noqa: E203
 
-    def beta_wlp(self, max_length: int | None = None) -> tuple[list[float], list[int]]:
+    def beta_wlp(
+        self, max_length: int | None = None
+    ) -> tuple[list[float], list[list[int]]]:
         """
         Find the permutation of the levels of the m four-level factors that minimize
         the qWLP for the design.
@@ -221,7 +223,7 @@ class Design:
 
         Returns
         -------
-        best_wlp, permutations : tuple[list[float], list[int]]
+        best_wlp, permutations : tuple[list[float], list[list[int]]
             Returns the minimal qWLP and the corresponding permutations of the
             factor levels. The qWLP starts with words of length 3.
         """
@@ -258,7 +260,7 @@ class Design:
 
         return best_vector, best_perm
 
-    def w2_wlp(self) -> tuple[list[float], str]:
+    def w2_wlp(self) -> tuple[list[int], str]:
         """
         Compute the W_2 word length pattern of the design.
         The structure of the W_2 vector is:
@@ -266,7 +268,7 @@ class Design:
 
         Returns
         -------
-        W2_vector: list[float]
+        W2_vector: list[int]
             The vector containing the A_x.i values of the W_2 word length pattern
         factor: str
             A string indicating which factor must be used to obtain W_2 optimal
@@ -362,7 +364,9 @@ class Design:
             flat_4lvl_part[:, (3 * i + 2)] = np.logical_not(
                 np.logical_xor(self.array[:, i] > 1, self.array[:, i] % 2 == 0)
             )
-        mat = np.concatenate((flat_4lvl_part, self.array[:, self.m :]), axis=1)
+        mat = np.concatenate(
+            (flat_4lvl_part, self.array[:, self.m :]), axis=1  # noqa: E203
+        )
         if zero_coding is False:
             return mat * 2 - 1
         else:
@@ -775,11 +779,11 @@ def qwlp(
     if any([len(i) != m for i in permutation_list]):
         raise ValueError("Each permutation must contain m sublists")
     # Each sublist in a permutation has to contain only 0,1,2,3
-    for p in permutation_list:
-        if any([len(i) != 4 for i in p]):
+    for perm in permutation_list:
+        if any([len(i) != 4 for i in perm]):
             raise ValueError("Each sublist in a permutation must contain four elements")
 
-        if any([i not in [0, 1, 2, 3] for x in p for i in x]):
+        if any([i not in [0, 1, 2, 3] for x in perm for i in x]):
             raise ValueError("Sublists in permutations can only contain 0, 1, 2, or 3")
 
     # Isolate four-level and two-level part of the design
@@ -817,14 +821,15 @@ def qwlp(
         # Initialize the length and type vectors
         fl_contrast_length = [i + 1 for _ in range(m) for i in range(3)]
 
-        # No interaction can be created
+        # No interaction can be created with one four-level factor
         if m == 1:
             fl_full_contrast_matrix = fl_contrast_matrix
         # Main effects for the two four-level factors and the 3^2 interactions between
         # the 6 terms.
         elif m == 2:
             fl_contrast_interaction_list = []
-            for p in product(range(3), repeat=2):
+            p: tuple[int, ...]  # Needed to establish the type of p later
+            for p in product([0, 1, 2], repeat=2):
                 new_p = [x + (3 * i) for i, x in enumerate(p)]
                 single_fl_contrast_interaction_vector = np.prod(
                     fl_contrast_matrix[:, new_p], axis=1
@@ -891,7 +896,7 @@ def qwlp(
             max_Aq_length = max_length + 1
         a_vector = []
         for length in range(3, max_Aq_length):
-            a_value = np.round(np.sum(correlation_sq[word_length == length]), 2)
+            a_value: float = round(np.sum(correlation_sq[word_length == length]), 2)
             a_vector.append(a_value)
         a_vectors_list.append(a_vector)
     return a_vectors_list
