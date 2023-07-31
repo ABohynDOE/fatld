@@ -451,7 +451,7 @@ class Design:
 
         - 4-4: interaction between two pseudo-factors of four-level factors
         - 4-2: interaction between a pseudo-factor of a four-level factor and
-          a two-level factor.
+               a two-level factor.
         - 2-2: interaction between two two-level factors.
 
         An interaction is called clear when it is not aliased with any other
