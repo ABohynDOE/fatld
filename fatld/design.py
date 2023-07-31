@@ -303,6 +303,29 @@ class Design:
 
         return beta_star_vector, best_perm
 
+    def beta_wlp(
+        self, max_length: int | None = None
+    ) -> tuple[list[float], list[int]]:
+        """
+        Find the permutation of the levels of the m four-level factors that
+        minimize the qWLP for the design.
+
+        Parameters
+        ----------
+        max_length : int, optional
+            Max word length to consider in the qWLP, by default None,
+            all the word lengths are computed (careful as it is computationally
+            intensive for large values of n).
+
+        Returns
+        -------
+        best_wlp, permutations : tuple[list[float], list[int]]
+            Returns the minimal qWLP and the corresponding permutations of the
+            factor levels. The qWLP starts with words of length 3.
+        """
+        beta_vector, perm = self.beta_star_wlp(max_length=max_length)
+        return [x[0] for x in beta_vector], perm
+
     def w2_wlp(self) -> tuple[list[int], str]:
         """
         Compute the W_2 word length pattern of the design.
