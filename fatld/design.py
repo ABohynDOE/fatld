@@ -219,29 +219,28 @@ class Design:
         else:
             return wlp_list[0 : (max_length - 2)]  # noqa: E203
 
-    def beta_wlp(
+    def beta_star_wlp(
         self, max_length: int | None = None
-    ) -> tuple[list[float], list[list[int]]]:
-        """
-        Find the permutation of the levels of the m four-level factors that
-        minimize the qWLP for the design.
+    ) -> "tuple[list[tuple[float]], list[list[int]]]":
+        """Compute the 𝛽* vector for a design.
+        It contains tuples with the 𝛽*_i value, and the A_i^0 value for values
+        of i starting with 3.
 
         Parameters
         ----------
-        max_length : int, optional
-            Max word length to consider in the qWLP, by default None,
-            all the word lengths are computed (careful as it is computationally
-            intensive for large values of n).
+        design : fatld.Design
+            A design object
+        max_length : int | None
+            Maximum value of i for which the 𝛽* is computed. Default is None,
+            so all length are considered.
 
         Returns
         -------
-        best_wlp, permutations : tuple[list[float], list[list[int]]
-            Returns the minimal qWLP and the corresponding permutations of the
-            factor levels. The qWLP starts with words of length 3.
+        beta_star_vector : list[tuple[float | int]]
+            The 𝛽* vector with tuples of 𝛽* and A_i^0 values
+        perm : list[list[int]]
+            Permutation of the four-level factors associated with the 𝛽* vector
         """
-        # Declare global variables
-        global scaled_contrast_matrix
-
         # Compute the 12 basic permutations of the four levels
         perms = []
         for p in permutations(range(3)):
@@ -256,21 +255,53 @@ class Design:
         for _, p in enumerate(product(range(12), repeat=self.m)):
             all_perms.append([perms[i] for i in p])
 
+        # Isolate four-level and two-level part of the design
+        m = self.m
+        fl_matrix = self.array[:, :m]
+        tl_matrix = self.array[:, m:]  # noqa: E201
+
+        # Build all interactions between all two-level factors
+        n = self.n
+        if max_length is None:
+            max_n_value = n
+        else:
+            max_n_value = max_length - 1
+        tfi_model_matrix = build_tfi_model_matrix(n=n, max_length=max_n_value)
+        tl_interaction_matrix = np.matmul(tl_matrix, tfi_model_matrix) % 2
+        tl_interaction_matrix = (2 * tl_interaction_matrix) - 1
+        tl_interaction_length = np.sum(tfi_model_matrix, axis=0).tolist()
+
         # Compute beta wlp for all permutations
-        a_vector_list = qwlp(
-            design=self, permutation_list=all_perms, max_length=max_length
-        )
+        beta_vector_list = []
+        for perms in all_perms:
+            beta_vector = compute_correlations(
+                tl_interaction_matrix=tl_interaction_matrix,
+                tl_interaction_length=tl_interaction_length,
+                fl_matrix=fl_matrix,
+                permutations_list=perms,
+                max_length=max_length,
+            )
+            beta_vector_list.append(beta_vector)
 
         # Find the best Beta vector and the corresponding permutation
-        best_vector = a_vector_list[0]
+        best_vector = beta_vector_list[0]
         best_perm = all_perms[0]
 
-        for i, v in enumerate(a_vector_list[1:]):
+        for i, v in enumerate(beta_vector_list[1:]):
             if best_vector > v:
                 best_vector = v
                 best_perm = all_perms[i]
 
-        return best_vector, best_perm
+        # Return a combination of the A_i^0 values and the beta values
+        beta_star_vector = []
+        twlp = self.twlp(type_0=True)
+        for i, x in enumerate(best_vector):
+            if i >= len(twlp):
+                beta_star_vector.append([x, 0])
+            else:
+                beta_star_vector.append([x, twlp[i][0]])
+
+        return beta_star_vector, best_perm
 
     def w2_wlp(self) -> tuple[list[int], str]:
         """
@@ -782,178 +813,242 @@ def from_array(mat: np.ndarray, zero_coded: bool = True) -> Design:
     return Design(run_size, n_flvl, added_cols)
 
 
-def qwlp(
-    design: Design,
-    permutation_list: list[list[list[int]]],
-    max_length: None | int = None,
-) -> list[list[float]]:
-    """
-    Compute the beta WLP of the design.
+def fl_to_contrast(
+    fl_matrix: np.ndarray,
+    scaled_contrast_matrix: np.ndarray,
+    permutations_list: "list[list[int]]",
+) -> np.ndarray:
+    """Decompose each four-level factor of `fl_matrix` into its three
+    polynomial components: linear (L), quadratic (Q), and cubic (C) and apply a
+    specific permutation to each factor.
 
     Parameters
     ----------
-    design : fatld.Design
-        Four-and-two-level design
-    permutation_list : list[list[list[int]]]
-        List of permutations for the m four-level factors.
-        Each permutation is a list of m sublists, where each sublist
-        corresponds to the ordering of the levels of a four-level factor
-        (of the form [0,1,2,3]).
-    max_length : None | int, optional
-        Maximum length of words considered in the beta WLP, by default None so
-        that all the word lengths are considered.
+    fl_matrix : np.ndarray
+        2D array of size N by m containing the m four-level factors with levels
+        0, 1, 2, and 3.
+    scaled_contrast_matrix : np.ndarray
+        2D array of size 4 by 3 containing the scaled polynomial contrasts.
+        The four rows correspond to the four levels of a four-level factor,
+        while the three columns correspond to the 3 polynomial contrasts:
+        linear (L), quadratic (Q), and cubic (C).
+    permutations_list : list[list[int]]
+        List of length m containing the permutations for the levels of each
+        four-level factor.
+        Each permutation must be a list of length four containing the levels 0,
+        1, 2, and 3 in a specific order.
 
     Returns
     -------
-    beta_wlp : list[list[float]]
-        List of vectors of the Aq values starting with words of length 3.
-        Each vector in the list corresponds to the beta wlp for the
-        corresponding permutation in `permutation_list`.
+    np.ndarray
+        2D array of size N by 3*m containing the LQC-decomposed four-level
+        factors with the permutations applied.
+
+    Raises
+    ------
+    ValueError
+        permutations_list must have the same length as the number of columns in
+        the fl_matrix.
+    :meta private:
+    """
+    # There must be one permutation for each 4LF
+    N, m = fl_matrix.shape
+    if len(permutations_list) != m:
+        raise ValueError("permutations_list must have length %i" % m)
+
+    # Matrix holding all contrasts for m 4LFs
+    fl_contrast_matrix = np.zeros((N, 3 * m), dtype=float)
+
+    # Apply each permutation to the contrast matrix sequentially
+    for fl_index, permutation in enumerate(permutations_list):
+        perm_contrast_matrix = scaled_contrast_matrix[permutation, :]
+        # Iterate over the permutated contrast matrix
+        for index, contrast_value in np.ndenumerate(perm_contrast_matrix):
+            i, j = index  # Unfold index for easier array indexing
+            # Fnd rows in 4lf equal to i
+            row_indices = fl_matrix[:, fl_index] == i
+            # Set these rows equal to the contrast value
+            fl_contrast_matrix[row_indices, 3 * fl_index + j] = contrast_value
+
+    return fl_contrast_matrix
+
+
+def contrast_interactions(
+    fl_contrast_matrix: np.ndarray, m: int
+) -> "tuple[np.ndarray, list[int]]":
+    """Compute all interactions of order 1 up to `m` for `m` four-level factors
+    decomposed into their LQC contrasts.
+
+    Parameters
+    ----------
+    fl_contrast_matrix : np.ndarray
+        2D array of size N by 3*m containing the LQC-decomposition of the m
+        four-level factors.
+    m : int
+        Number of four-level factors.
+
+    Returns
+    -------
+    fl_full_contrast_matrix : np.ndarray
+        2D array containing all interactions between the LQC contrasts of m
+        four-level factors.
+    fl_contrast_length :  list[int]
+        List containing the order (L is 1, Q is 2, and C is 3) of all the
+        interactions generated
+
+    Raises
+    ------
+    ValueError
+        The number of four-level factors `m` must be either 1, 2, or 3.
+    """
+    # Number of 4LF is either 1, 2, or 3
+    if m not in [1, 2, 3]:
+        raise ValueError("`m` must be 1, 2, or 3.")
+
+    # Contrast length is 1, 2, 3 for L, Q, C
+    fl_contrast_length = [i + 1 for _ in range(m) for i in range(3)]
+
+    # Number of runs to define empty matrices
+    N = fl_contrast_matrix.shape[0]
+
+    # No interaction can be created with one four-level factor
+    if m == 1:
+        fl_full_contrast_matrix = fl_contrast_matrix
+
+    # Main effects for the two four-level factors and the 3^2 interactions
+    # between the 6 terms.
+    elif m == 2:
+        fl_contrast_interaction_matrix = np.zeros((N, 9), dtype=float)
+        for fac_idx, pair in enumerate(product([0, 1, 2], [3, 4, 5])):
+            fl_contrast_interaction_matrix[:, fac_idx] = np.prod(
+                fl_contrast_matrix[:, pair], axis=1
+            )
+            normalized_indices = [i % 3 for i in pair]
+            fl_contrast_length.append(sum(normalized_indices) + 2)
+        fl_full_contrast_matrix: np.ndarray = np.hstack(
+            (fl_contrast_matrix, fl_contrast_interaction_matrix)
+        )
+
+    # Three different terms:
+    # - Main effects for the 3 four-level factors (3*3=9 terms)
+    # - Interactions between 2 of the 3 four-level factors (3 ways of
+    # creating 9)
+    # - Interactions between the 3 four-level factors (27 terms)
+    elif m == 3:
+        # Interactions between 2 of the 3 four-level factors
+        fl_contrast_2f_interaction_matrix = np.zeros((N, 27), dtype=float)
+        for comb_idx, combi in enumerate([(0, 1), (0, 2), (1, 2)]):
+            range1 = [3 * combi[0], 3 * combi[0] + 1, 3 * combi[0] + 2]
+            range2 = [3 * comb[1], 3 * comb[1] + 1, 3 * comb[1] + 2]
+            for pair_idx, pair in enumerate(product(range1, range2)):
+                index = 9 * comb_idx + pair_idx
+                fl_contrast_2f_interaction_matrix[:, index] = np.prod(
+                    fl_contrast_matrix[:, pair], axis=1
+                )[:, None]
+                normalized_indices = [i % 3 for i in pair]
+                fl_contrast_length.append(sum(normalized_indices) + 2)
+
+        # Interactions between 3 four-level factors
+        fl_contrast_3f_interaction_matrix = np.zeros((N, 27), dtype=float)
+        for triplet_idx, triplet in enumerate(
+            product([0, 1, 2], [3, 4, 5], [6, 7, 8])
+        ):
+            fl_contrast_3f_interaction_matrix[:, triplet_idx] = np.prod(
+                fl_contrast_matrix[:, triplet], axis=1
+            )[:, None]
+            normalized_indices = [i % 3 for i in triplet]
+            fl_contrast_length.append(sum(normalized_indices) + 3)
+
+        # Join ME, 2FI, and 3FI into a single matrix
+        fl_full_contrast_matrix: np.ndarray = np.hstack(
+            (
+                fl_contrast_matrix,
+                fl_contrast_2f_interaction_matrix,
+                fl_contrast_3f_interaction_matrix,
+            )
+        )
+    return fl_full_contrast_matrix, fl_contrast_length  # type: ignore
+
+
+def compute_correlations(
+    tl_interaction_matrix: np.ndarray,
+    tl_interaction_length: "list[int]",
+    fl_matrix: np.ndarray,
+    permutations_list: "list[list[int]]",
+    max_length: int | None = None,
+) -> "list[float]":
+    """Compute the squared correlations between the two-level
+    factors, and the LQC decomposition of the four-level factors.
+    Summarise the correlations by summing them by interaction order.
+
+    For example, an interaction between a xyz interaction (order 3) and a Q
+    component (order 2), has order 5.
+
+    Parameters
+    ----------
+    tl_interaction_matrix : np.ndarray
+        2D array containing all interactions between two-level factors.
+    tl_interaction_length : list[int]
+        A list containing the order of all interactions between two-level
+        factors. It must have the same size as the number of columns in
+        `tl_interaction_matrix`.
+    fl_matrix : np.ndarray
+        2D array of size N by m containing the four-level factors.
+    permutations_list : list[list[int]]
+        List of length m containing the permutations for the levels of each
+        four-level factor.
+        Each permutation must be a list of length four containing the levels 0,
+        1, 2, and 3 in a specific order.
+    max_length : int | None, optional
+        Maximum order to consider when summing the correlations. Default is
+        None so all orders are considered.
+
+    Returns
+    -------
+    beta_vector : list[float]
+        A list of the summed squared correlations, starting with order 3 and
+        going up to order `max_length`.
     """
     # Declare global variables
     global scaled_contrast_matrix
 
-    design_matrix = design.array
-    m = design.m
-    n = design.n
-    N = design.runsize
+    # Compute runsize and number of four-level factors
+    N, m = fl_matrix.shape
 
-    # Each permutation must contain m sublists
-    if any([len(i) != m for i in permutation_list]):
-        raise ValueError("Each permutation must contain m sublists")
-    # Each sublist in a permutation has to contain only 0,1,2,3
-    for perm in permutation_list:
-        if any([len(i) != 4 for i in perm]):
-            raise ValueError(
-                "Each sublist in a permutation must contain four elements"
-            )
+    # Unfold and permute levels of 4LFs
+    fl_contrast_matrix = fl_to_contrast(
+        fl_matrix=fl_matrix,
+        scaled_contrast_matrix=scaled_contrast_matrix,
+        permutations_list=permutations_list,
+    )
 
-        if any([i not in [0, 1, 2, 3] for x in perm for i in x]):
-            raise ValueError(
-                "Sublists in permutations can only contain 0, 1, 2, or 3"
-            )
+    # Length of the contrasts unfolded from the 4LF
+    fl_full_contrast_matrix, fl_contrast_length = contrast_interactions(
+        fl_contrast_matrix=fl_contrast_matrix, m=m
+    )
 
-    # Isolate four-level and two-level part of the design
-    fl_matrix = design_matrix[:, :m]
-    tl_matrix = design_matrix[:, m:]
+    # Build word length vector
+    word_length = (
+        np.array(fl_contrast_length)[:, None].T
+        + np.array(tl_interaction_length)[:, None]
+    )
 
-    # Build all interactions between all two-level factors
+    # Compute squared correlations
+    correlation = (tl_interaction_matrix.T @ fl_full_contrast_matrix) / N
+    correlation_sq = np.round(correlation**2, 2)
+
+    # Compute Beta values
+    max_possible_length = max(fl_contrast_length) + max(tl_interaction_length)
     if max_length is None:
-        max_n_value = n
+        max_Aq_length = max_possible_length
     else:
-        max_n_value = max_length - 1
-    tfi_model_matrix = build_tfi_model_matrix(n=n, max_length=max_n_value)
-    tl_interaction_matrix = np.matmul(tl_matrix, tfi_model_matrix) % 2
-    tl_interaction_matrix = (2 * tl_interaction_matrix) - 1
-    tl_interaction_length = np.sum(tfi_model_matrix, axis=0).tolist()
+        max_Aq_length = max_length + 1
+    beta_vector = []
+    for length in range(3, max_Aq_length):
+        beta_value = np.round(np.sum(correlation_sq[word_length == length]), 2)
+        beta_vector.append(beta_value)
 
-    # Empty list to hold the Beta vectors for all the permutations
-    a_vectors_list = []
-    for single_permutation in permutation_list:
-        # Unfold the four-level factors into L, Q, C matrices
-        fl_contrast_list = []
-        for x in range(m):
-            permutation = single_permutation[x]
-            mix_contrast_matrix = scaled_contrast_matrix[permutation, :]
-            single_fl_contrast_matrix = np.zeros((N, 3))
-            for i in range(4):
-                single_fl_contrast_matrix[
-                    fl_matrix[:, x] == i, :
-                ] = mix_contrast_matrix[  # noqa: E201
-                    i, :
-                ]
-            fl_contrast_list.append(single_fl_contrast_matrix)
-        fl_contrast_matrix = np.hstack(fl_contrast_list)
-
-        # Initialize the length and type vectors
-        fl_contrast_length = [i + 1 for _ in range(m) for i in range(3)]
-
-        # No interaction can be created with one four-level factor
-        if m == 1:
-            fl_full_contrast_matrix = fl_contrast_matrix
-        # Main effects for the two four-level factors and the 3^2 interactions
-        # between the 6 terms.
-        elif m == 2:
-            fl_contrast_interaction_list = []
-            p: tuple[int, ...]  # Needed to establish the type of p later
-            for p in product([0, 1, 2], repeat=2):
-                new_p = [x + (3 * i) for i, x in enumerate(p)]
-                single_fl_contrast_interaction_vector = np.prod(
-                    fl_contrast_matrix[:, new_p], axis=1
-                )[:, None]
-                fl_contrast_interaction_list.append(
-                    single_fl_contrast_interaction_vector
-                )
-                fl_contrast_length.append(sum(p) + 2)
-            fl_contrast_interaction_matrix = np.hstack(
-                fl_contrast_interaction_list
-            )
-            fl_full_contrast_matrix = np.concatenate(
-                (fl_contrast_matrix, fl_contrast_interaction_matrix), axis=1
-            )
-        # Three different terms:
-        # - Main effects for the 3 four-level factors (3*3=9 terms)
-        # - Interactions between 2 of the 3 four-level factors (3 ways of
-        #   creating 9)
-        # - Interactions between the 3 four-level factors (27 terms)
-        elif m == 3:
-            # Interactions between 2 of the 3 four-level factors
-            fl_contrast_interaction_list = []
-            for c in combinations(range(3), 2):
-                for p in product(range(3), repeat=2):
-                    new_p = [3 * c[i] + x for i, x in enumerate(p)]
-                    single_fl_contrast_interaction_vector = np.prod(
-                        fl_contrast_matrix[:, new_p], axis=1
-                    )[:, None]
-                    fl_contrast_interaction_list.append(
-                        single_fl_contrast_interaction_vector
-                    )
-                    fl_contrast_length.append(sum(p) + 2)
-
-            # Interactions between 3 four-level factors
-            for p in product(range(3), repeat=3):
-                # p is a tuple with two numbers corresponding with the
-                # polynomial contrasts chosen for the product
-                new_p = [3 * i + x for i, x in enumerate(p)]
-                single_fl_contrast_interaction_vector = np.prod(
-                    fl_contrast_matrix[:, new_p], axis=1
-                )[:, None]
-                fl_contrast_interaction_list.append(
-                    single_fl_contrast_interaction_vector
-                )
-                fl_contrast_length.append(sum(p) + 3)
-            fl_contrast_interaction_matrix = np.hstack(
-                fl_contrast_interaction_list
-            )
-            fl_full_contrast_matrix = np.concatenate(
-                (fl_contrast_matrix, fl_contrast_interaction_matrix), axis=1
-            )
-        else:
-            raise ValueError("Unknown m value: %i" % m)
-
-        # Build word length vector
-        word_length = (
-            np.array(fl_contrast_length)[:, None].T
-            + np.array(tl_interaction_length)[:, None]  # noqa: W503
-        )
-
-        # Compute squared correlations
-        correlation = (tl_interaction_matrix.T @ fl_full_contrast_matrix) / N
-        correlation_sq = np.round(correlation**2, 2)
-
-        # Compute Beta values
-        if max_length is None:
-            max_Aq_length = int(np.amax(word_length)) + 1
-        else:
-            max_Aq_length = max_length + 1
-        a_vector = []
-        for length in range(3, max_Aq_length):
-            a_value: float = round(
-                np.sum(correlation_sq[word_length == length]), 2
-            )
-            a_vector.append(a_value)
-        a_vectors_list.append(a_vector)
-    return a_vectors_list
+    return beta_vector
 
 
 def nbr_interactions(n: int, max_length: int) -> int:
