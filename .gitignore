@@ -44,7 +44,7 @@ poetry/core/*
 .ruff_cache/
 htmlcov/
 *.ipynb
-
+coverage.sh
 
 ## Quarto rendering of fatld_presentation
 fatld_presentation_files/
