@@ -25,7 +25,7 @@ author = "Alexandre Bohyn"
 
 # The full version, including alpha/beta/rc tags
 # release = pkg_resources.get_distribution("fatld").version
-release = "0.1.4"
+release = "0.1.8"
 
 # -- General configuration ---------------------------------------------------
 
