@@ -10,9 +10,9 @@ def num2gen(n: int, m: Optional[int] = None) -> str:
     """
     Return the generator corresponding to a given column number
 
-    If a value is provided for the number of four-level factors, the pseudo-factors
-    used to generate the four-level factors will be replaced by their corresponding
-    labels in the generator.
+    If a value is provided for the number of four-level factors, the
+    pseudo-factors used to generate the four-level factors will be replaced by
+    their corresponding labels in the generator.
     The labels are:
 
     - `A1=a`, `A2=b`, `A3=ab` for the first factor
@@ -25,8 +25,9 @@ def num2gen(n: int, m: Optional[int] = None) -> str:
         Column number
 
     m : Optional[int]
-        Number of four-level factors. If no value is provided, the generator will be
-        considered to come from a two-level design. By default, no value is provided.
+        Number of four-level factors. If no value is provided, the generator
+        will be considered to come from a two-level design. By default, no
+        value is provided.
 
 
     Examples
@@ -96,17 +97,18 @@ def relabel_word(word: str, m: int) -> str:
     """
     Relabel basic factors in a word to their corresponding pseudo-factors.
 
-    Relabel a word containing only two-level factors by replacing the basic factors
-    used as pseudo-factors by their corresponding pseudo-factor labels.
-    The pseudo-factor labels are A_i, B_i and C_i with i = 1,2,3, for the first,
-    second, and third four-level factor, respectively.
+    Relabel a word containing only two-level factors by replacing the basic
+    factors used as pseudo-factors by their corresponding pseudo-factor labels.
+    The pseudo-factor labels are A_i, B_i and C_i with i = 1,2,3, for the
+    first, second, and third four-level factor, respectively.
 
     Parameters
     ----------
     word : str
         Word to relabel
     m : int
-        Number of four-level factors. Define up to which factor the relabeling occurs.
+        Number of four-level factors. Define up to which factor the relabeling
+        occurs.
 
     Examples
     --------
@@ -124,7 +126,8 @@ def relabel_word(word: str, m: int) -> str:
             f"{chr(97 + 2 * i)}{chr(97 + 2 * i + 1)}",
         ]
         pf_labels = [f"{chr(65 + i)}{x}" for x in [1, 2, 3]]
-        # We start with p1p2 to avoid replacing p1/p2 first and not the interaction
+        # We start with p1p2 to avoid replacing p1/p2 first and not the
+        # interaction
         s = (
             word.replace(pf_factors[2], pf_labels[2])
             .replace(pf_factors[1], pf_labels[1])
@@ -165,12 +168,14 @@ def word_type(word: str) -> int:
 class Relation:
     # TODO: document the relation class
     def __init__(self, words: List[str], m: int = 0):
-        # `m` can only be 0, 1,2 or 3 since there can't be more four-level factors
-        # 0 means there are no four-level factors
+        # `m` can only be 0, 1,2 or 3 since there can't be more four-level
+        # factors, 0 means there are no four-level factors
         if m not in [0, 1, 2, 3]:
             raise ValueError("m can only take value of 0, 1, 2, and 3")
         # Words must be strings and only contain basic factors
-        if not isinstance(words, List) or any([not isinstance(w, str) for w in words]):
+        if not isinstance(words, List) or any(
+            [not isinstance(w, str) for w in words]
+        ):
             raise TypeError("Words must be given as a list of strings")
         if any([(ord(i) > 122 or ord(i) < 97) for w in words for i in w]):
             raise ValueError(
@@ -179,7 +184,9 @@ class Relation:
             )
         self.m = m
         self.words = words
-        self.relabel_words = [relabel_word(word=w, m=self.m) for w in self.words]
+        self.relabel_words = [
+            relabel_word(word=w, m=self.m) for w in self.words
+        ]
 
     def __repr__(self):
         return f"{self.relabel_words}"
@@ -212,13 +219,17 @@ class Relation:
             for comb in word_combination:
                 word_freq = Counter("".join(comb))
                 remaining_factors = [
-                    factor for factor, freq in word_freq.items() if freq % 2 == 1
+                    factor
+                    for factor, freq in word_freq.items()
+                    if freq % 2 == 1
                 ]
                 remaining_factors.sort()
                 new_word = "".join(remaining_factors)
                 full_relation.append(new_word)
         if relabel:
-            return [relabel_word(word=word, m=self.m) for word in full_relation]
+            return [
+                relabel_word(word=word, m=self.m) for word in full_relation
+            ]
         else:
             return full_relation
 
@@ -244,7 +255,8 @@ class Relation:
         full_relation = self.expand(relabel=True)
         lengths = [word_length(w) for w in full_relation]
         types = [word_type(w) for w in full_relation]
-        # Each sublist must be initiated as an individual object (can't do shallow copy)
+        # Each sublist must be initiated as an individual object (can't do
+        # shallow copy)
         wlp = [[0 for _ in range(self.m + 1)] for _ in range(max(lengths) + 1)]
         for i, x in enumerate(lengths):
             t = types[i]

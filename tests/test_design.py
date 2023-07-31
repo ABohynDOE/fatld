@@ -7,7 +7,6 @@ Author: Alexandre Bohyn
 import numpy as np
 import pandas as pd  # type: ignore
 import pytest  # type: ignore
-import itertools
 
 from collections import Counter
 
@@ -22,7 +21,7 @@ class TestDesignErrors:
 class TestDesignMethods:
     # Design 6 from Table 3 of Wu (1993)
     design = fatld.Design(runsize=32, m=1, cols=[29, 26, 22])
-    relation = fatld.relation.Relation(["bcef", "bdeg", "acdeh"], m=1)  # type: ignore
+    relation = fatld.relation.Relation(["bcef", "bdeg", "acdeh"], m=1)
 
     def test_twlp(self):
         twlp = self.design.twlp(max_length=5)
@@ -113,13 +112,19 @@ class TestClarity:
                 row_index = "all"
             else:
                 row_index = row
-            for col in ["4-4 clear", "4-2 clear", "2-2 clear", "Totally clear"]:
+            for col in [
+                "4-4 clear",
+                "4-2 clear",
+                "2-2 clear",
+                "Totally clear",
+            ]:
                 if col == "Totally clear":
                     col_index = "all"
                 else:
                     col_index = col.replace(" clear", "")
                 assertion_list.append(
-                    self.design.clear(row_index, col_index) == self.df.loc[row, col]
+                    self.design.clear(row_index, col_index)
+                    == self.df.loc[row, col]
                 )
         assert all(assertion_list)
 
@@ -135,36 +140,6 @@ def test_from_array():
     assert D.cols == newD.cols
 
 
-def test_beta_aberration_m1():
-    D = fatld.Design(32, 1, [12, 20, 24, 29])
-
-    # Compute the 12 permutations of the four levels
-    perms = []
-    for p in itertools.permutations(range(3)):
-        for i in range(4):
-            ordering = list(p)
-            ordering.insert(i, 3)
-            perms.append(ordering)
-    perms = perms[:12]
-
-    # Compute all the beta WLP
-    a_vector_list = fatld.design.qwlp(design=D, permutation_list=[[i] for i in perms])
-
-    # Select only the unique qWLP
-    unique_qwlp = []
-    for i, beta_vector in enumerate(a_vector_list):
-        if beta_vector not in unique_qwlp:
-            unique_qwlp.append(beta_vector)
-
-    final_list = [
-        [0.0, 0.0, 3.0, 4.0, 0.0, 0.0, 1.0, 0.0],
-        [0.0, 2.4, 3.2, 0.6, 0.8, 0.8, 0.0, 0.2],
-        [0.0, 0.6, 0.8, 2.4, 3.2, 0.2, 0.0, 0.8],
-    ]
-
-    assert unique_qwlp == final_list
-
-
 def test_beta_wlp():
     D = fatld.Design(32, 2, [17, 18, 20, 24, 19, 28, 5, 9, 6, 10, 7, 11, 13])
     vec, perm = D.beta_wlp(max_length=5)
@@ -172,7 +147,9 @@ def test_beta_wlp():
 
 
 def test_beta_aberration_low_n():
-    D = fatld.Design(32, 2, [31])  # Here n = 2 which is lower than the max_length set
+    D = fatld.Design(
+        32, 2, [31]
+    )  # Here n = 2 which is lower than the max_length set
     qvec, perm = D.beta_wlp(max_length=6)
     assert qvec == [0.0, 0.0, 0.0, 1.0]
 
