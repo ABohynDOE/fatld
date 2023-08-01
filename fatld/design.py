@@ -354,8 +354,11 @@ class Design:
             )
             block_wlp = [design_wlp[i] - x for i, x in enumerate(trmt_wlp)]
             w2_vector = build_w2_vector(block_wlp, trmt_wlp)
+            # Nothing is returned if the vectors cannot be combined
+            if w2_vector is None:
+                continue
             # Set as default if it is the first factor we evaluate
-            if factor_index == 0:
+            if factor_index == 0 or best_w2_vector == []:
                 best_w2_vector = w2_vector
             else:
                 if w2_vector < best_w2_vector:
@@ -380,6 +383,11 @@ class Design:
             The alpha word length pattern
         """
         twlp = self.twlp(max_length=4)
+        # For cases with designs with not enough words
+        if len(twlp) == 0:
+            twlp = [[0, 0, 0], [0, 0, 0, 0]]
+        elif len(twlp) == 1:
+            twlp.append([0, 0, 0, 0])
         a3_vector = twlp[0] + [0] * (3 - len(twlp[0]))  # Right pad with 0
         a4_vector = twlp[1] + [0] * (4 - len(twlp[1]))
         omega_weights = {
@@ -962,12 +970,12 @@ def contrast_interactions(
         fl_contrast_2f_interaction_matrix = np.zeros((N, 27), dtype=float)
         for comb_idx, combi in enumerate([(0, 1), (0, 2), (1, 2)]):
             range1 = [3 * combi[0], 3 * combi[0] + 1, 3 * combi[0] + 2]
-            range2 = [3 * comb[1], 3 * comb[1] + 1, 3 * comb[1] + 2]
+            range2 = [3 * combi[1], 3 * combi[1] + 1, 3 * combi[1] + 2]
             for pair_idx, pair in enumerate(product(range1, range2)):
                 index = 9 * comb_idx + pair_idx
                 fl_contrast_2f_interaction_matrix[:, index] = np.prod(
                     fl_contrast_matrix[:, pair], axis=1
-                )[:, None]
+                )
                 normalized_indices = [i % 3 for i in pair]
                 fl_contrast_length.append(sum(normalized_indices) + 2)
 
@@ -978,7 +986,7 @@ def contrast_interactions(
         ):
             fl_contrast_3f_interaction_matrix[:, triplet_idx] = np.prod(
                 fl_contrast_matrix[:, triplet], axis=1
-            )[:, None]
+            )
             normalized_indices = [i % 3 for i in triplet]
             fl_contrast_length.append(sum(normalized_indices) + 3)
 
@@ -1122,7 +1130,7 @@ def build_tfi_model_matrix(n: int, max_length: int) -> np.ndarray:
 
 def build_w2_vector(
     blocking_wlp: list[int], treatment_wlp: list[int]
-) -> list[int]:
+) -> list[int] | None:
     """
     Compute the W_2 word length pattern (WLP) of a design, given its treatment
     WLP and blocking WLP.
@@ -1131,6 +1139,21 @@ def build_w2_vector(
     """
     if len(blocking_wlp) != len(treatment_wlp):
         raise ValueError("Both WLP must have the same length")
+    if len(blocking_wlp) <= 3:
+        if any([i != 0 for i in blocking_wlp]) or any(
+            [i != 0 for i in treatment_wlp]
+        ):
+            warnings.warn(
+                "A vector contains a non-zero A_i value for i < 3",
+                UserWarning,
+            )
+            return None
+        else:
+            warnings.warn(
+                "WLPs too short to combine. Returning a zero vector",
+                UserWarning,
+            )
+            return [0, 0, 0]
     w2_vector = [treatment_wlp[3], blocking_wlp[3]]
     n_words = len(blocking_wlp) - 1
     max_i = 1 + (n_words - 1) // 2

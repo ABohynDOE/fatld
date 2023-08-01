@@ -11,6 +11,7 @@ import pytest  # type: ignore
 from collections import Counter
 
 import fatld
+import random
 
 
 class TestDesignErrors:
@@ -164,3 +165,25 @@ def test_tfi_model_matrix():
     c = Counter(int_length)
     d = dict(c)
     assert d == {1: 7, 2: 21, 3: 35, 4: 35, 5: 21}
+
+
+def test_beta_star_m3():
+    """Test the computation of B* vector for m=3"""
+    D = fatld.Design(64, 3, [22, 27, 41, 46])
+    b, p = D.beta_star_wlp(max_length=6)
+    assert b == [[0.0, 0], [0.1, 0], [3.2, 0], [2.9, 0]]
+
+
+def test_beta_star_sum():
+    """
+    Test that for any design, the sum of A_i^0  words is equal to the sum of
+    the beta* values
+    """
+    available_cols = [
+        i for i in range(1, 32) if i not in [1, 2, 3, 4, 8, 12, 16]
+    ]
+    cols = random.sample(available_cols, 5)
+    D = fatld.Design(32, 2, cols)
+    ai_values = [sum(i[1:]) for i in D.twlp(type_0=True)]
+    beta_values = [b[0] for b in D.beta_star_wlp()[0]]
+    assert np.round(sum(ai_values)) == np.round(sum(beta_values))
