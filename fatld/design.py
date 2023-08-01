@@ -962,12 +962,12 @@ def contrast_interactions(
         fl_contrast_2f_interaction_matrix = np.zeros((N, 27), dtype=float)
         for comb_idx, combi in enumerate([(0, 1), (0, 2), (1, 2)]):
             range1 = [3 * combi[0], 3 * combi[0] + 1, 3 * combi[0] + 2]
-            range2 = [3 * comb[1], 3 * comb[1] + 1, 3 * comb[1] + 2]
+            range2 = [3 * combi[1], 3 * combi[1] + 1, 3 * combi[1] + 2]
             for pair_idx, pair in enumerate(product(range1, range2)):
                 index = 9 * comb_idx + pair_idx
                 fl_contrast_2f_interaction_matrix[:, index] = np.prod(
                     fl_contrast_matrix[:, pair], axis=1
-                )[:, None]
+                )
                 normalized_indices = [i % 3 for i in pair]
                 fl_contrast_length.append(sum(normalized_indices) + 2)
 
@@ -978,7 +978,7 @@ def contrast_interactions(
         ):
             fl_contrast_3f_interaction_matrix[:, triplet_idx] = np.prod(
                 fl_contrast_matrix[:, triplet], axis=1
-            )[:, None]
+            )
             normalized_indices = [i % 3 for i in triplet]
             fl_contrast_length.append(sum(normalized_indices) + 3)
 
