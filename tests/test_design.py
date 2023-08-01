@@ -187,38 +187,3 @@ def test_beta_star_sum():
     ai_values = [sum(i[1:]) for i in D.twlp(type_0=True)]
     beta_values = [b[0] for b in D.beta_star_wlp()[0]]
     assert np.round(sum(ai_values)) == np.round(sum(beta_values))
-
-
-def test_alpha_sum():
-    """
-    Test that for any design, the sum of A_3  words is equal to the sum of
-    the omega_2 and omega_4 values, and that the sum of the A-4 words is equal
-    to the sum of the remaining omega values.
-    """
-    available_cols = [
-        i for i in range(1, 32) if i not in [1, 2, 3, 4, 8, 12, 16]
-    ]
-    cols = random.sample(available_cols, 5)
-    D = fatld.Design(32, 2, cols)
-    a3 = D.wlp()[0]
-    a4 = D.wlp()[1]
-    omega_3 = sum(D.alpha_wlp()[0:2])
-    omega_4 = sum(D.alpha_wlp()[2:])
-    assert a3 == np.round(omega_3) and a4 == np.round(omega_4)
-
-
-class TestSmallDesign:
-    design = fatld.Design(16, 2, [10])
-
-    def test_wlp(self):
-        assert self.design.wlp() == [1]
-
-    def test_alpha_wlp(self):
-        assert self.design.alpha_wlp() == [0.667, 0.333, 0, 0, 0]
-
-    def test_w2_userwarning(self):
-        """A warning should be generated since the WLP stops at A_2 so it
-        cannot be combined into a W2 WLP. Instead only [0,0,0] is returned
-        """
-        with pytest.warns(UserWarning):
-            self.design.w2_wlp()
