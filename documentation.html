@@ -1,0 +1,980 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="References" href="references.html" />
+
+    <link rel="shortcut icon" href="_static/favicon.png"/><!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
+        <title>Documentation - fatld 0.1.9 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<div class="announcement">
+  <aside class="announcement-content">
+      🚧 Website in progress 🚧 Feel free to give a hand 🔨 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">fatld 0.1.9 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">fatld 0.1.9 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="factors.html">Factors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="words.html">Words</a></li>
+<li class="toctree-l1"><a class="reference internal" href="relation.html">Defining relation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Four-and-two-level designs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wlp.html">Word length pattern</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tfi.html">Two-factor interactions</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Documentation</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/ABohynDOE/fatld/edit/master/docs/documentation.md" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section class="tex2jax_ignore mathjax_ignore" id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">#</a></h1>
+<section id="module-fatld.relation">
+<span id="words"></span><h2>Words<a class="headerlink" href="#module-fatld.relation" title="Permalink to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fatld.relation.gen2num">
+<span class="sig-name descname"><span class="pre">gen2num</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#fatld.relation.gen2num" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert a generator into its corresponding column number</p>
+<p>Generators can only contain lowercase letters from a to z.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>g</strong> (<em>str</em>) – Generator</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gen2num</span><span class="p">(</span><span class="s1">&#39;acd&#39;</span><span class="p">)</span>
+<span class="go">13</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#fatld.relation.num2gen" title="fatld.relation.num2gen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num2gen</span></code></a></dt><dd><p>Convert a column number into its corresponding generator</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fatld.relation.num2gen">
+<span class="sig-name descname"><span class="pre">num2gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#fatld.relation.num2gen" title="Permalink to this definition">#</a></dt>
+<dd><p>Return the generator corresponding to a given column number</p>
+<p>If a value is provided for the number of four-level factors, the
+pseudo-factors used to generate the four-level factors will be replaced by
+their corresponding labels in the generator.
+The labels are:</p>
+<ul class="simple">
+<li><p><cite>A1=a</cite>, <cite>A2=b</cite>, <cite>A3=ab</cite> for the first factor</p></li>
+<li><p><cite>B1=c</cite>, <cite>B2=d</cite>, <cite>B3=cd</cite> for the second factor</p></li>
+<li><p><cite>C1=e</cite>, <cite>C2=f</cite>, <cite>C3=ef</cite> for the third factor</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>) – Column number</p></li>
+<li><p><strong>m</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Number of four-level factors. If no value is provided, the generator
+will be considered to come from a two-level design. By default, no
+value is provided.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">num2gen</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="go">&#39;abc&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">num2gen</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;A1c&#39;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#fatld.relation.gen2num" title="fatld.relation.gen2num"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen2num</span></code></a></dt><dd><p>Convert a generator into the corresponding column number</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fatld.relation.relabel_word">
+<span class="sig-name descname"><span class="pre">relabel_word</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#fatld.relation.relabel_word" title="Permalink to this definition">#</a></dt>
+<dd><p>Relabel basic factors in a word to their corresponding pseudo-factors.</p>
+<p>Relabel a word containing only two-level factors by replacing the basic
+factors used as pseudo-factors by their corresponding pseudo-factor labels.
+The pseudo-factor labels are A_i, B_i and C_i with i = 1,2,3, for the
+first, second, and third four-level factor, respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>word</strong> (<em>str</em>) – Word to relabel</p></li>
+<li><p><strong>m</strong> (<em>int</em>) – Number of four-level factors. Define up to which factor the relabeling
+occurs.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># The value of `m` define how many factors are relabeled</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">relabel_word</span><span class="p">(</span><span class="n">word</span><span class="o">=</span><span class="s1">&#39;abcde&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;A3cde&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">relabel_word</span><span class="p">(</span><span class="n">word</span><span class="o">=</span><span class="s1">&#39;abcde&#39;</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">&#39;A3B3C1&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fatld.relation.word_length">
+<span class="sig-name descname"><span class="pre">word_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#fatld.relation.word_length" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the length of a word that can contain pseudo-factors.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">word_length</span><span class="p">(</span><span class="s1">&#39;abcd&#39;</span><span class="p">)</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">word_length</span><span class="p">(</span><span class="s1">&#39;A1cdC1&#39;</span><span class="p">)</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fatld.relation.word_type">
+<span class="sig-name descname"><span class="pre">word_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">word</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#fatld.relation.word_type" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the type of a word that can contain pseudo-factors.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">word_type</span><span class="p">(</span><span class="s1">&#39;abcde&#39;</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">word_type</span><span class="p">(</span><span class="s1">&#39;A1cde&#39;</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="defining-relation">
+<h2>Defining relation<a class="headerlink" href="#defining-relation" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fatld.relation.Relation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fatld.relation.Relation" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="fatld.relation.Relation.expand">
+<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relabel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fatld.relation.Relation.expand" title="Permalink to this definition">#</a></dt>
+<dd><p>Expand a defining subgroup into the complete defining relation.</p>
+<p>For a defining subgroup with <cite>p</cite> members, expand it into all <cite>2^p -1</cite>
+interactions between the members.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>relabel</strong> (<em>bool</em>) – Relabel the pseudo-factors in the words of the defining relation.
+Default is False</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Relation</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;abcdf&#39;</span><span class="p">,</span> <span class="s1">&#39;aceg&#39;</span><span class="p">],</span> <span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
+<span class="go">[&#39;abcdf&#39;, &#39;aceg&#39;, &#39;bdefg&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># You can also relabel the pseudo-factors in the words</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">relabel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">[&#39;A3cdf&#39;, &#39;A1ceg&#39;, &#39;A2defg&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.relation.Relation.word_length_pattern">
+<span class="sig-name descname"><span class="pre">word_length_pattern</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fatld.relation.Relation.word_length_pattern" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the type-specific word length pattern of the defining relation.</p>
+<p>The type-specific word length pattern is a list of sublists, where the
+sublist at index <cite>i</cite> is the number of word of length <cite>3+i</cite>, ordered by
+increasing type.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a relation with two words of type 1 and length 4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Relation</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;abcdf&#39;</span><span class="p">,</span> <span class="s1">&#39;aceg&#39;</span><span class="p">],</span> <span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The third word is bdefg and has length 5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">word_length_pattern</span><span class="p">()</span>
+<span class="go">[[0, 0], [0, 2], [0, 1]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># If m=0, then output a normal word length pattern</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Relation</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;abcdf&#39;</span><span class="p">,</span> <span class="s1">&#39;aceg&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">word_length_pattern</span><span class="p">()</span>
+<span class="go">[0, 1, 2]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="design">
+<span id="design-documentation"></span><h2>Design<a class="headerlink" href="#design" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fatld.design.Design">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Design</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fatld.design.Design" title="Permalink to this definition">#</a></dt>
+<dd><p>Regular design with four-level and two-level factors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>runsize</strong> (<em>int</em>) – Number of runs</p></li>
+<li><p><strong>m</strong> (<em>int</em>) – Number of four-level factors</p></li>
+<li><p><strong>cols</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – List of the added factors of the design. Cannot contain columns used
+in four-level factors and basic factors.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.runsize">
+<span class="sig-name descname"><span class="pre">runsize</span></span><a class="headerlink" href="#fatld.design.Design.runsize" title="Permalink to this definition">#</a></dt>
+<dd><p>Number of runs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.m">
+<span class="sig-name descname"><span class="pre">m</span></span><a class="headerlink" href="#fatld.design.Design.m" title="Permalink to this definition">#</a></dt>
+<dd><p>Number of four-level factors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.n">
+<span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#fatld.design.Design.n" title="Permalink to this definition">#</a></dt>
+<dd><p>Number of two-level factors in the design</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#fatld.design.Design.k" title="Permalink to this definition">#</a></dt>
+<dd><p>Number of basic factors. Equals to the log2 of the runsize.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.p">
+<span class="sig-name descname"><span class="pre">p</span></span><a class="headerlink" href="#fatld.design.Design.p" title="Permalink to this definition">#</a></dt>
+<dd><p>Number of added factors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.bf">
+<span class="sig-name descname"><span class="pre">bf</span></span><a class="headerlink" href="#fatld.design.Design.bf" title="Permalink to this definition">#</a></dt>
+<dd><p>List of the column numbers of the basic factors not used in the
+pseudo-factors <cite>pf</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.pf">
+<span class="sig-name descname"><span class="pre">pf</span></span><a class="headerlink" href="#fatld.design.Design.pf" title="Permalink to this definition">#</a></dt>
+<dd><p>List of the pseudo-factors triplets (as lists of integers), used to
+define the four-level factors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[List[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.af">
+<span class="sig-name descname"><span class="pre">af</span></span><a class="headerlink" href="#fatld.design.Design.af" title="Permalink to this definition">#</a></dt>
+<dd><p>List of the column numbers of the added factors</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.cols">
+<span class="sig-name descname"><span class="pre">cols</span></span><a class="headerlink" href="#fatld.design.Design.cols" title="Permalink to this definition">#</a></dt>
+<dd><p>List of the column numbers of all the two-level factors of the design.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fatld.design.Design.array">
+<span class="sig-name descname"><span class="pre">array</span></span><a class="headerlink" href="#fatld.design.Design.array" title="Permalink to this definition">#</a></dt>
+<dd><p>Design matrix of the design with the four-level factors first and then
+the two-level factors. The two-level factors are ordered by column
+number and not kept in the original order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.add_factor">
+<span class="sig-name descname"><span class="pre">add_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fatld.design.Design.add_factor" title="Permalink to this definition">#</a></dt>
+<dd><p>Add a two-level factor to the design.</p>
+<p>Generate a design with an added two-level factor defined by the number
+supplied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>number</strong> (<em>int</em>) – Column number of the factor to add. Cannot correspond to a column
+number already in use (as two-level factor or pseudo-factor) in the
+design.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <cite>Design</cite> object containing the added two-level factor</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#fatld.design.Design" title="fatld.design.Design">Design</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.alpha_wlp">
+<span class="sig-name descname"><span class="pre">alpha_wlp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rounding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fatld.design.Design.alpha_wlp" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the alpha word length pattern of the design.
+The alpha wlp contains 5 values ordered in the following way:
+ω4, ω2, ω42, ω22, ω44</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rounding</strong> (<em>bool</em><em>, </em><em>optional</em>) – Round the ω values to 2 decimals, by default True</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The alpha word length pattern</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.beta_star_wlp">
+<span class="sig-name descname"><span class="pre">beta_star_wlp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fatld.design.Design.beta_star_wlp" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the 𝛽* vector for a design.
+It contains tuples with the 𝛽*_i value, and the A_i^0 value for values
+of i starting with 3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>design</strong> (<em>fatld.Design</em>) – A design object</p></li>
+<li><p><strong>max_length</strong> (<em>int</em><em> | </em><em>None</em>) – Maximum value of i for which the 𝛽* is computed. Default is None,
+so all length are considered.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>beta_star_vector</strong> (<em>list[tuple[float | int]]</em>) – The 𝛽* vector with tuples of 𝛽* and A_i^0 values</p></li>
+<li><p><strong>perm</strong> (<em>list[list[int]]</em>) – Permutation of the four-level factors associated with the 𝛽* vector</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.beta_wlp">
+<span class="sig-name descname"><span class="pre">beta_wlp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fatld.design.Design.beta_wlp" title="Permalink to this definition">#</a></dt>
+<dd><p>Find the permutation of the levels of the m four-level factors that
+minimize the qWLP for the design.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_length</strong> (<em>int</em><em>, </em><em>optional</em>) – Max word length to consider in the qWLP, by default None,
+all the word lengths are computed (careful as it is computationally
+intensive for large values of n).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>best_wlp, permutations</strong> – Returns the minimal qWLP and the corresponding permutations of the
+factor levels. The qWLP starts with words of length 3.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[list[float], list[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.clarity">
+<span class="sig-name descname"><span class="pre">clarity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#fatld.design.Design.clarity" title="Permalink to this definition">#</a></dt>
+<dd><p>Generate the clarity matrix of the design.</p>
+<p>The clarity matrix is a table where:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>the rows represent the type of the interactions (4-4, 4-2, 2-2,</dt><dd><p>or any type)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>the columns represent the type of clarity that the interactions can</dt><dd><p>have (4-4 clear, 4-2 clear, 2-2 clear, or totally clear)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A pandas dataframe holding the clarity matrix where the rows are
+[“4-4”, “4-2”, “2-2”, “Any type”] and the columns are [“4-4 clear”,
+“4-2 clear”, “2-2 clear”, “Totally clear”]</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>clarity_matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interaction_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#fatld.design.Design.clear" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the number of interactions of type <cite>interaction_type</cite> that are
+clear from interactions of the <cite>clear_from</cite> type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interaction_type</strong> (<em>str</em>) – Type of the interaction studied. Can either be “4-4”, “4-2”, “2-2”,
+or “all” to count for all types of interaction.</p></li>
+<li><p><strong>clear_from</strong> (<em>str</em>) – Type of clarity to count. Can either be “4-4”, “4-2”, “2-2”, or
+“all” to count the number of totally clear interaction.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.defining_relation">
+<span class="sig-name descname"><span class="pre">defining_relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fatld.design.Design.defining_relation" title="Permalink to this definition">#</a></dt>
+<dd><p>Generate the defining relation of the design.</p>
+<p>For each added factor, generate the word representing the added factor.
+Each word contains the generator + the letter representing the added
+factor.
+The pseudo-factors used to generate the four-level factors are replaced
+by four-level factors labels in the final words.
+For example, if factor <cite>A</cite> is created using pseudo-factors <cite>a</cite>, <cite>b</cite>
+and <cite>ab</cite>, then the replacement scheme is: <cite>a -&gt; A1</cite>, <cite>b -&gt; A2</cite>,
+and <cite>ab -&gt; A3</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>raw</strong> (<em>bool</em><em>, </em><em>optional</em>) – Return the relation without replacing the pseudo-factors by their
+four-level factor label, by default False</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Defining relation as a <code class="docutils literal notranslate"><span class="pre">Relation</span></code> object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#fatld.relation.Relation" title="fatld.relation.Relation">Relation</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.flatten">
+<span class="sig-name descname"><span class="pre">flatten</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zero_coding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#fatld.design.Design.flatten" title="Permalink to this definition">#</a></dt>
+<dd><p>Flatten each four-level factor of the design into three two-level
+pseudo-factors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>zero_coding</strong> (<em>bool</em><em>, </em><em>optional</em>) – The matrix is in 0/1 coding instead of -1/1 coding, by default True</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The flattened design containing <cite>2*m + n</cite> two-level factors</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.remove_factor">
+<span class="sig-name descname"><span class="pre">remove_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fatld.design.Design.remove_factor" title="Permalink to this definition">#</a></dt>
+<dd><p>Remove a two-level factor from the design.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>number</strong> (<em>int</em>) – Column number of the factor to remove. Must correspond to one of
+the factor used in the design.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <cite>Design</cite> object containing the added two-level factor</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#fatld.design.Design" title="fatld.design.Design">Design</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.resolution">
+<span class="sig-name descname"><span class="pre">resolution</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#fatld.design.Design.resolution" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the resolution of the design.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.tfi_clearance">
+<span class="sig-name descname"><span class="pre">tfi_clearance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">object</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fatld.design.Design.tfi_clearance" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute clarity of all two-factor interactions in the design.</p>
+<p>There are three types of two-factor interactions in a design:</p>
+<ul class="simple">
+<li><p>4-4: interaction between two pseudo-factors of four-level factors</p></li>
+<li><dl class="simple">
+<dt>4-2: interaction between a pseudo-factor of a four-level factor and</dt><dd><p>a two-level factor.</p>
+</dd>
+</dl>
+</li>
+<li><p>2-2: interaction between two two-level factors.</p></li>
+</ul>
+<p>An interaction is called clear when it is not aliased with any other
+interaction of a specific type. Thus, an interaction is ‘4-4 clear’
+when it is not aliased with any 4-4 interactions, ‘4-2 clear’ when it
+is not aliased with any 4-2 interactions, and ‘2-2 clear’ when it is
+not aliased with any 2-2 interactions.
+When an interaction is 4-4 clear, 4-2 clear, and 2-2 clear, we call it
+a totally clear (TC)” interaction.
+Defining how clear is an interaction, is called the <em>clarity</em> of an
+interaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul>
+<li><p><em>A dictionary where each entry corresponds to an interaction of the</em></p></li>
+<li><p><em>design, where the key is the name of the interaction, and the value is</em></p></li>
+<li><p><em>another dictionary containing four entries</em> –</p>
+<ul class="simple">
+<li><p>‘clear’: the interaction is clear from main effects</p></li>
+<li><p>’4-4’: the interaction is ‘4-4’ clear (True or False)</p></li>
+<li><p>’4-2’: the interaction is ‘4-2’ clear (True or False)</p></li>
+<li><p>’2-2’: the interaction is ‘2-2’ clear (True or False)</p></li>
+<li><p>’Type’: the type of the interaction, either ‘4-4’, ‘4-2’,</p></li>
+</ul>
+<p>or ‘2-2’</p>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.twlp">
+<span class="sig-name descname"><span class="pre">twlp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fatld.design.Design.twlp" title="Permalink to this definition">#</a></dt>
+<dd><p>Type-specific word length pattern</p>
+<p>Compute the type-specific word length pattern of a design, starting
+with words of length 3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type_0</strong> (<em>bool</em><em>, </em><em>optional</em>) – Return the word length pattern of type 0, by default True.
+If False, return the word length pattern of type <cite>m</cite>.</p></li>
+<li><p><strong>max_length</strong> (<em>int</em><em>, </em><em>optional</em>) – Max word length to display in the word length pattern, by default
+None, all the word lengths are displayed.
+If this number is more than the maximum word length of the design,
+ignores it.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Type-specific word length pattern, starting with words of length 3.
+Each sublist give the number of words of that length, sorted by
+type.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[List[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.w2_wlp">
+<span class="sig-name descname"><span class="pre">w2_wlp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fatld.design.Design.w2_wlp" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the W_2 word length pattern of the design.
+The structure of the W_2 vector is:
+A3.0, A2.1, A4.0, A5.0, A3.1, A6.0, A7.0, …</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>W2_vector</strong> (<em>list[int]</em>) – The vector containing the A_x.i values of the W_2 word length
+pattern</p></li>
+<li><p><strong>factor</strong> (<em>str</em>) – A string indicating which factor must be used to obtain W_2 optimal
+blocking. Can either be ‘A’, ‘B’, or ‘C’.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fatld.design.Design.wlp">
+<span class="sig-name descname"><span class="pre">wlp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#fatld.design.Design.wlp" title="Permalink to this definition">#</a></dt>
+<dd><p>Generalized word length pattern</p>
+<p>Compute the word length pattern, i.e., the number of words in the
+defining relation of the design, and arrange them by length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_length</strong> (<em>int</em><em>, </em><em>optional</em>) – Max word length to display in the word length pattern, by default
+None, all the word lengths are displayed.
+If this number is more than the maximum word length of the design,
+ignores it.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Word length pattern, starting with words of length 3.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fatld.design.from_array">
+<span class="sig-name descname"><span class="pre">from_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zero_coded</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#fatld.design.Design" title="fatld.design.Design"><span class="pre">Design</span></a></span></span><a class="headerlink" href="#fatld.design.from_array" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a Design object from a matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat</strong> (<em>np.ndarray</em>) – Design matrix</p></li>
+<li><p><strong>zero_coded</strong> (<em>bool</em><em>, </em><em>optional</em>) – The two-level factors in the design matrix are coded in 0/1, by
+default True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Design object with the factors detected in the matrix.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#fatld.design.Design" title="fatld.design.Design">Design</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="references.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">References</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Alexandre Bohyn
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/ABohynDOE/fatld/" aria-label="GitHub">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Documentation</a><ul>
+<li><a class="reference internal" href="#module-fatld.relation">Words</a><ul>
+<li><a class="reference internal" href="#fatld.relation.gen2num"><code class="docutils literal notranslate"><span class="pre">gen2num()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.relation.num2gen"><code class="docutils literal notranslate"><span class="pre">num2gen()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.relation.relabel_word"><code class="docutils literal notranslate"><span class="pre">relabel_word()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.relation.word_length"><code class="docutils literal notranslate"><span class="pre">word_length()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.relation.word_type"><code class="docutils literal notranslate"><span class="pre">word_type()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#defining-relation">Defining relation</a><ul>
+<li><a class="reference internal" href="#fatld.relation.Relation"><code class="docutils literal notranslate"><span class="pre">Relation</span></code></a><ul>
+<li><a class="reference internal" href="#fatld.relation.Relation.expand"><code class="docutils literal notranslate"><span class="pre">Relation.expand()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.relation.Relation.word_length_pattern"><code class="docutils literal notranslate"><span class="pre">Relation.word_length_pattern()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#design">Design</a><ul>
+<li><a class="reference internal" href="#fatld.design.Design"><code class="docutils literal notranslate"><span class="pre">Design</span></code></a><ul>
+<li><a class="reference internal" href="#fatld.design.Design.runsize"><code class="docutils literal notranslate"><span class="pre">Design.runsize</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.m"><code class="docutils literal notranslate"><span class="pre">Design.m</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.n"><code class="docutils literal notranslate"><span class="pre">Design.n</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.k"><code class="docutils literal notranslate"><span class="pre">Design.k</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.p"><code class="docutils literal notranslate"><span class="pre">Design.p</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.bf"><code class="docutils literal notranslate"><span class="pre">Design.bf</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.pf"><code class="docutils literal notranslate"><span class="pre">Design.pf</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.af"><code class="docutils literal notranslate"><span class="pre">Design.af</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.cols"><code class="docutils literal notranslate"><span class="pre">Design.cols</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.array"><code class="docutils literal notranslate"><span class="pre">Design.array</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.add_factor"><code class="docutils literal notranslate"><span class="pre">Design.add_factor()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.alpha_wlp"><code class="docutils literal notranslate"><span class="pre">Design.alpha_wlp()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.beta_star_wlp"><code class="docutils literal notranslate"><span class="pre">Design.beta_star_wlp()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.beta_wlp"><code class="docutils literal notranslate"><span class="pre">Design.beta_wlp()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.clarity"><code class="docutils literal notranslate"><span class="pre">Design.clarity()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.clear"><code class="docutils literal notranslate"><span class="pre">Design.clear()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.defining_relation"><code class="docutils literal notranslate"><span class="pre">Design.defining_relation()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.flatten"><code class="docutils literal notranslate"><span class="pre">Design.flatten()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.remove_factor"><code class="docutils literal notranslate"><span class="pre">Design.remove_factor()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.resolution"><code class="docutils literal notranslate"><span class="pre">Design.resolution()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.tfi_clearance"><code class="docutils literal notranslate"><span class="pre">Design.tfi_clearance()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.twlp"><code class="docutils literal notranslate"><span class="pre">Design.twlp()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.w2_wlp"><code class="docutils literal notranslate"><span class="pre">Design.w2_wlp()</span></code></a></li>
+<li><a class="reference internal" href="#fatld.design.Design.wlp"><code class="docutils literal notranslate"><span class="pre">Design.wlp()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fatld.design.from_array"><code class="docutils literal notranslate"><span class="pre">from_array()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=a4622379"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>
