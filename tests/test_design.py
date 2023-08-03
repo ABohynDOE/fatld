@@ -156,7 +156,7 @@ def test_beta_aberration_low_n():
 
 
 def test_number_interactions():
-    assert fatld.design.nbr_interactions(7, 5) == 119
+    assert fatld.main.nbr_interactions(7, 5) == 119
 
 
 def test_tfi_model_matrix():
